@@ -6,7 +6,7 @@ logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s
 
 # ⚠️ መረጃዎችህን እዚህ አስተካክል
 BOT_TOKEN = "8301746478:AAG8NBsjPtuZvia-9Ai8UG4WGEYXyJO6yw8"
-WEBAPP_URL = "https://sami37-cpu.github.io/my-bingo-bot/" 
+WEBAPP_URL = "https://samialehegn1-a11y.github.io/my-bingo-bot/" 
 
 # 6 ቻናሎች (1-5 ግዴታ፤ 6ኛው አማራጭ)
 CHANNELS = [
