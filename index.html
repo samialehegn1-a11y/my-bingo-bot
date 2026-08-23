@@ -62,13 +62,15 @@
         .tab-screen { display: none; } .tab-screen.active { display: block; }
 
         .custom-popup { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.85); z-index: 999999; justify-content: center; align-items: center; }
-        .popup-box { background: #1f1838; border: 1px solid #ffca28; border-radius: 15px; padding: 20px; width: 280px; text-align: center; }
+        .popup-box { background: #1f1838; border: 1px solid #ffca28; border-radius: 15px; padding: 20px; width: 290px; text-align: center; }
+        .popup-input { width: 100%; background: #0d081a; border: 1px solid #291d4a; color: #fff; padding: 10px; border-radius: 8px; font-size: 12px; margin-bottom: 10px; }
     </style>
 </head>
 <body>
 
     <div class="header-title">SAFARI BINGO</div>
 
+    <!-- ALERT POPUP -->
     <div id="alertModal" class="custom-popup">
         <div class="popup-box">
             <div id="alertMsg" style="font-size:13px; color:#fff; margin-bottom:15px; line-height:1.4;"></div>
@@ -76,6 +78,21 @@
         </div>
     </div>
 
+    <!-- WITHDRAW FORM POPUP -->
+    <div id="withdrawModal" class="custom-popup">
+        <div class="popup-box">
+            <div style="font-size:15px; font-weight:bold; color:#ffca28; margin-bottom:12px;">💸 ገንዘብ ማውጫ</div>
+            <input type="number" id="wd-amount" class="popup-input" placeholder="የሚወጣው መጠን (ብር)">
+            <input type="text" id="wd-bank" class="popup-input" placeholder="የባንክ ስም (ምሳሌ: CBE, Telebirr)">
+            <input type="text" id="wd-acc" class="popup-input" placeholder="የሂሳብ/ስልክ ቁጥር">
+            <div style="display:flex; gap:8px;">
+                <button onclick="submitWithdrawal()" style="flex:1; background:#00d26a; border:none; color:#000; padding:10px; border-radius:8px; font-weight:bold; cursor:pointer;">ላክ</button>
+                <button onclick="closeWithdrawModal()" style="flex:1; background:#e53935; border:none; color:#fff; padding:10px; border-radius:8px; font-weight:bold; cursor:pointer;">ሰርዝ</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- BINGO WIN POPUP -->
     <div id="bingoWinModal" class="bingo-modal">
         <div class="win-card">
             <div style="font-size: 35px; margin-bottom: -5px;">👑</div>
@@ -95,7 +112,6 @@
     <!-- TAB 1: GAME SCREEN -->
     <div id="tab-game" class="tab-screen active">
         
-        <!-- STEP 1: HOME STAKE -->
         <div id="screen-home">
             <div class="stake-card">
                 <div style="color: #9c94b8; font-size: 11px; font-weight: 700; margin-bottom: 15px; letter-spacing: 1px;">CHOOSE YOUR STAKE</div>
@@ -105,7 +121,6 @@
             </div>
         </div>
 
-        <!-- STEP 2: CARTEL SELECTION & 30s COUNTDOWN -->
         <div id="screen-select-cartel" style="display: none;">
             <div style="display:flex; justify-content:space-between; align-items:center; padding:0 15px;">
                 <button onclick="backToHome()" style="background:#261d47; border:none; color:#fff; padding:6px 12px; border-radius:8px; font-size:11px; font-weight:bold; cursor:pointer;">← Back</button>
@@ -119,9 +134,7 @@
             </div>
         </div>
 
-        <!-- STEP 3: ACTIVE GAME BOARD -->
         <div id="screen-active-game" style="display: none;">
-            
             <div class="top-stats">
                 <div class="stat-box"><div class="stat-lbl">Game ID</div><div class="stat-val" style="font-size:10px;" id="game-id-val">DB0DG8HF</div></div>
                 <div class="stat-box"><div class="stat-lbl">Players</div><div class="stat-val" id="players-val">321</div></div>
@@ -187,7 +200,7 @@
         <div class="stake-card">
             <div class="balance-label">ቀሪ ሂሳብ</div>
             <div class="balance-val" id="wallet-balance-disp">20 ብር</div>
-            <button class="play-btn" style="background:#ff9800; font-size:15px; margin-top:15px;" onclick="showAlert('የክፍያ ጥያቄዎ ተቀባይነት አግኝቷል!')">ገንዘብ ማውጣት (Withdraw)</button>
+            <button class="play-btn" style="background:#ff9800; font-size:15px; margin-top:15px;" onclick="openWithdrawModal()">ገንዘብ ማውጣት (Withdraw)</button>
         </div>
     </div>
 
@@ -214,9 +227,9 @@
 
     <script>
         // ----------------------------------------------------
-        // 📌 [መስመር 228] እዚህ ጋር የቦትህን Username (ያለ @) አስገባ!
+        // 📌 [መስመር 236] እዚህ ጋር የቦትህን Username (ያለ @) አስገባ!
         // ----------------------------------------------------
-        const BOT_USERNAME = "safariibingobot"; 
+        const BOT_USERNAME = "SafariBingoBot"; 
         // ----------------------------------------------------
 
         const tg = window.Telegram.WebApp;
@@ -228,7 +241,7 @@
             document.getElementById('tg-user-id').innerText = userId;
         }
 
-        let inviteLink = `https://t.me/${safariibingobot}?start=ref_${userId}`;
+        let inviteLink = `https://t.me/${BOT_USERNAME}?start=ref_${userId}`;
         document.getElementById('my-ref-link').value = inviteLink;
 
         function shareInviteLink() {
@@ -245,7 +258,6 @@
         let countdownTimer = null;
         let botSelectionTimer = null;
         let timeLeft = 30;
-
         let drawnBallsHistory = [];
 
         const fakeWinners = [
@@ -262,22 +274,52 @@
         }
         function closeAlert() { document.getElementById('alertModal').style.display = 'none'; }
 
-        // 🔊 Male Voice Synthesis (የወንድ ድምፅ)
+        // Withdraw Popup Functions
+        function openWithdrawModal() {
+            document.getElementById('withdrawModal').style.display = 'flex';
+        }
+        function closeWithdrawModal() {
+            document.getElementById('withdrawModal').style.display = 'none';
+        }
+        function submitWithdrawal() {
+            let amt = parseFloat(document.getElementById('wd-amount').value);
+            let bank = document.getElementById('wd-bank').value;
+            let acc = document.getElementById('wd-acc').value;
+
+            if (!amt || amt <= 0 || !bank || !acc) {
+                showAlert("እባክዎን ሁሉንም የክፍያ መረጃዎች በትክክል ይሙሉ!");
+                return;
+            }
+            if (amt > balance) {
+                showAlert("ይቅርታ! በቂ ቀሪ ሂሳብ የለዎትም።");
+                return;
+            }
+
+            balance -= amt;
+            document.getElementById('user-balance-val').innerText = balance;
+            document.getElementById('wallet-balance-disp').innerText = balance + " ብር";
+            closeWithdrawModal();
+            showAlert(`የ ${amt} ብር ማውጣት ጥያቄዎ ወደ ${bank} (${acc}) ተልኳል። በቅርብ ጊዜ ገቢ ይደረጋል!`);
+        }
+
+        // Male Voice Synthesis with Audio Unlock
         function speakMaleVoice(text) {
             if ('speechSynthesis' in window) {
                 window.speechSynthesis.cancel();
                 let msg = new SpeechSynthesisUtterance(text);
-                msg.lang = 'en-US'; // Numbers sound clearer in EN, works well in Telegram
+                msg.lang = 'en-US';
                 let voices = window.speechSynthesis.getVoices();
-                let maleVoice = voices.find(v => v.name.includes('Male') || v.name.includes('David') || v.name.includes('George') || v.name.includes('Google US English'));
+                let maleVoice = voices.find(v => v.name.includes('Male') || v.name.includes('David') || v.name.includes('George'));
                 if (maleVoice) msg.voice = maleVoice;
-                msg.rate = 0.9;
-                msg.pitch = 0.75; // Lower pitch for male voice feel
+                msg.rate = 0.85;
+                msg.pitch = 0.8;
                 window.speechSynthesis.speak(msg);
             }
         }
 
         function goToCartelSelection() {
+            // Unlock Web Speech Audio context on initial user click
+            speakMaleVoice("");
             if (balance < 10) { showAlert("ይቅርታ! በቂ ቀሪ ሂሳብ የለም።"); return; }
             document.getElementById('screen-home').style.display = 'none';
             document.getElementById('screen-select-cartel').style.display = 'block';
@@ -331,14 +373,12 @@
             }
         }
 
-        // Gradual Bot Selection during 30s Countdown
         function startSelectionCountdown() {
             timeLeft = 30;
             let availableFreeCells = [];
             for(let i=1; i<=250; i++) {
                 if(!occupiedCartels.includes(i)) availableFreeCells.push(i);
             }
-            // Shuffle free cells for random bot selection
             availableFreeCells.sort(() => Math.random() - 0.5);
             let botPickCount = 0;
 
@@ -347,13 +387,12 @@
                 document.getElementById('selection-status').innerText = `ጨዋታ ሊጀመር ${timeLeft} ሰከንድቀረ`;
                 document.getElementById('start-game-btn').innerText = `▶ ጨዋታውን ጀምር (${timeLeft}s)`;
 
-                // Slowly pick cells over the 30 seconds to look real
-                if(botPickCount < 40 && availableFreeCells.length > 0 && timeLeft % 1 === 0) {
+                if(botPickCount < 40 && availableFreeCells.length > 0) {
                     let cellToPick = availableFreeCells.pop();
                     let el = document.getElementById(`cell-250-${cellToPick}`);
                     if(el && !el.classList.contains('my-choice')) {
                         el.classList.add('bot-picking');
-                        setTimeout(() => { el.classList.remove('bot-picking'); el.classList.add('taken'); }, 800);
+                        setTimeout(() => { el.classList.remove('bot-picking'); el.classList.add('taken'); }, 700);
                         botPickCount++;
                     }
                 }
@@ -417,7 +456,7 @@
 
                 let ballNum;
                 if (callCount === 14) {
-                    ballNum = 47; // winning trigger ball
+                    ballNum = 47;
                 } else {
                     ballNum = Math.floor(Math.random() * 75) + 1;
                     while (drawnBallsHistory.includes(ballNum)) ballNum = Math.floor(Math.random() * 75) + 1;
@@ -442,7 +481,6 @@
                     else cellElem.classList.add('drawn-orange');
                 }
 
-                // Update user cartel markings dynamically based on called balls
                 if (selectedCartels.length > 0) {
                     render5x5Card('my-cartel-5x5', drawnBallsHistory);
                 }
@@ -470,7 +508,6 @@
             if(!container) return;
             container.innerHTML = '';
             
-            // Sample fixed card numbers layout
             let sampleNums = [12,16,38,49,66, 3,20,45,46,69, 2,25,'★',57,63, 9,28,40,58,70, 4,23,35,53,74];
             sampleNums.forEach((n) => {
                 let cell = document.createElement('div');
@@ -478,7 +515,6 @@
                 if (n === '★') {
                     cell.className += ' star';
                 } else if (drawnList.includes(n)) {
-                    // Only mark if the ball has actually been drawn in the game!
                     cell.className += ' marked';
                 }
                 cell.innerText = n;
@@ -494,7 +530,6 @@
 
             currentFakeWinnerIndex = (currentFakeWinnerIndex + 1) % fakeWinners.length;
 
-            // 30 Seconds countdown before next game popup closes and resets
             let winTimerLeft = 30;
             let winInterval = setInterval(() => {
                 winTimerLeft--;
