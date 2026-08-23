@@ -11,25 +11,22 @@
         
         .header-title { font-size: 20px; font-weight: 900; letter-spacing: 1px; color: #fff; padding: 15px 0; text-align: left; padding-left: 15px; }
 
-        /* PHOTO 1 STYLES */
         .stake-card { background: #16102b; border-radius: 24px; padding: 25px 20px; margin: 15px; border: 1px solid #291d4a; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
         .play-btn { background: #00d26a; border: none; color: #000; font-size: 20px; font-weight: 900; padding: 16px; border-radius: 30px; width: 100%; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 0 15px rgba(0, 210, 106, 0.4); }
         .balance-label { color: #8880a6; font-size: 11px; margin-top: 20px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; }
         .balance-val { font-size: 32px; font-weight: 900; color: #fff; margin-top: 5px; }
 
-        /* TOP STATS BAR (PHOTO 2) */
         .top-stats { display: flex; gap: 4px; padding: 5px; background: #0d081a; }
         .stat-box { background: #1c1438; border-radius: 8px; flex: 1; padding: 6px 2px; }
         .stat-lbl { font-size: 9px; color: #9c94b8; font-weight: 700; }
         .stat-val { font-size: 12px; font-weight: 900; color: #fff; margin-top: 2px; }
 
-        /* PHOTO 4 - CARTEL SELECTION BOARD (250 NUMBERS) */
         .selection-grid { display: grid; grid-template-columns: repeat(8, 1fr); gap: 4px; padding: 10px; max-height: 380px; overflow-y: auto; background: #16102b; border-radius: 12px; margin: 10px 15px; border: 1px solid #291d4a; }
         .num-cell { background: #261d47; border-radius: 6px; padding: 10px 0; font-size: 11px; font-weight: 800; cursor: pointer; color: #b2a9d4; }
         .num-cell.taken { background: #e65100 !important; color: #fff !important; cursor: not-allowed; opacity: 0.9; }
         .num-cell.my-choice { background: #00d26a !important; color: #000 !important; font-weight: 900; }
+        .num-cell.bot-picking { background: #ff9800 !important; color: #000 !important; font-weight: 900; transition: background 0.3s; }
 
-        /* PHOTO 2 - GAME LAYOUT */
         .game-layout { display: flex; gap: 8px; padding: 8px; text-align: left; }
         .left-matrix { display: flex; flex-direction: column; width: 48%; background: #171131; border-radius: 12px; padding: 5px; border: 1px solid #291e4f; }
         .bingo-cols { display: grid; grid-template-columns: repeat(5, 1fr); gap: 2px; text-align: center; margin-bottom: 5px; }
@@ -48,19 +45,16 @@
         .current-ball-box { background: #171131; border-radius: 16px; padding: 15px; text-align: center; border: 1px solid #291e4f; }
         .big-ball { width: 65px; height: 65px; border-radius: 50%; border: 4px solid #ffca28; margin: 0 auto; display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 900; color: #fff; background: #231942; }
 
-        .watching-box { background: #171131; border-radius: 12px; padding: 20px 10px; flex: 1; text-align: center; border: 1px solid #291e4f; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .watching-box { background: #171131; border-radius: 12px; padding: 15px 10px; flex: 1; text-align: center; border: 1px solid #291e4f; display: flex; flex-direction: column; align-items: center; justify-content: center; }
 
-        /* 5x5 CARTEL DISPLAY (PHOTO 3 WIN & MY CARTEL) */
         .cartel-5x5 { display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; background: #231a44; padding: 6px; border-radius: 10px; width: 100%; }
         .c-cell { background: #fff; color: #000; font-size: 11px; font-weight: 900; padding: 8px 0; border-radius: 4px; text-align: center; }
         .c-cell.marked { background: #00d26a !important; color: #000 !important; }
         .c-cell.star { background: #00d26a !important; color: #fff !important; }
 
-        /* PHOTO 3 BINGO WIN POPUP */
         .bingo-modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(5, 2, 15, 0.95); z-index: 99999; align-items: center; justify-content: center; padding: 20px; }
         .win-card { background: #181233; border: 1px solid #332766; border-radius: 20px; padding: 20px; width: 100%; max-width: 320px; text-align: center; box-shadow: 0 0 30px rgba(0,210,106,0.2); }
 
-        /* BOTTOM NAV */
         .nav-bar { position: fixed; bottom: 0; left: 0; right: 0; background: #0a0614; display: flex; justify-content: space-around; padding: 8px 0; border-top: 1px solid #1a1233; z-index: 999; }
         .nav-item { color: #5f577d; font-size: 9px; font-weight: 800; cursor: pointer; text-align: center; flex: 1; }
         .nav-item.active { color: #00d26a; }
@@ -75,7 +69,6 @@
 
     <div class="header-title">SAFARI BINGO</div>
 
-    <!-- GENERAL ALERT MODAL -->
     <div id="alertModal" class="custom-popup">
         <div class="popup-box">
             <div id="alertMsg" style="font-size:13px; color:#fff; margin-bottom:15px; line-height:1.4;"></div>
@@ -83,7 +76,6 @@
         </div>
     </div>
 
-    <!-- PHOTO 3 WIN POPUP MODAL -->
     <div id="bingoWinModal" class="bingo-modal">
         <div class="win-card">
             <div style="font-size: 35px; margin-bottom: -5px;">👑</div>
@@ -96,17 +88,14 @@
             </div>
             <div class="cartel-5x5" id="win-cartel-board"></div>
             
-            <div style="font-size: 10px; color: #786f99; margin-top: 15px; font-weight: 700;">STARTING IN 5S</div>
-            <div style="height: 4px; background: #261c47; border-radius: 2px; margin-top: 5px; overflow: hidden;">
-                <div style="height:100%; width:100%; background:#ff9800;"></div>
-            </div>
+            <div style="font-size: 10px; color: #786f99; margin-top: 15px; font-weight: 700;" id="next-game-timer-txt">NEXT GAME IN 30S</div>
         </div>
     </div>
 
     <!-- TAB 1: GAME SCREEN -->
     <div id="tab-game" class="tab-screen active">
         
-        <!-- STEP 1: HOME STAKE (PHOTO 1) -->
+        <!-- STEP 1: HOME STAKE -->
         <div id="screen-home">
             <div class="stake-card">
                 <div style="color: #9c94b8; font-size: 11px; font-weight: 700; margin-bottom: 15px; letter-spacing: 1px;">CHOOSE YOUR STAKE</div>
@@ -116,25 +105,23 @@
             </div>
         </div>
 
-        <!-- STEP 2: CARTEL SELECTION (PHOTO 4) -->
+        <!-- STEP 2: CARTEL SELECTION & 30s COUNTDOWN -->
         <div id="screen-select-cartel" style="display: none;">
             <div style="display:flex; justify-content:space-between; align-items:center; padding:0 15px;">
                 <button onclick="backToHome()" style="background:#261d47; border:none; color:#fff; padding:6px 12px; border-radius:8px; font-size:11px; font-weight:bold; cursor:pointer;">← Back</button>
-                <div style="font-size:12px; color:#ffca28; font-weight:bold;" id="selection-status">የተመረጡ: 0 ካርቴላ (0 ብር)</div>
+                <div style="font-size:12px; color:#ffca28; font-weight:bold;" id="selection-status">ጨዋታ ሊጀመር 30 ሰከንድቀረ</div>
             </div>
 
-            <!-- 250 Cartel Grid -->
             <div class="selection-grid" id="cartel-board-250"></div>
 
             <div style="padding: 0 15px;">
-                <button class="play-btn" onclick="confirmAndStartGame()">▶ ጨዋታውን ጀምር</button>
+                <button class="play-btn" id="start-game-btn" onclick="confirmAndStartGame()">▶ ጨዋታውን ጀምር (30s)</button>
             </div>
         </div>
 
-        <!-- STEP 3: ACTIVE GAME BOARD (PHOTO 2) -->
+        <!-- STEP 3: ACTIVE GAME BOARD -->
         <div id="screen-active-game" style="display: none;">
             
-            <!-- STATS HEADER (PHOTO 2) -->
             <div class="top-stats">
                 <div class="stat-box"><div class="stat-lbl">Game ID</div><div class="stat-val" style="font-size:10px;" id="game-id-val">DB0DG8HF</div></div>
                 <div class="stat-box"><div class="stat-lbl">Players</div><div class="stat-val" id="players-val">321</div></div>
@@ -143,9 +130,7 @@
                 <div class="stat-box"><div class="stat-lbl">Called</div><div class="stat-val" id="called-count-val">0</div></div>
             </div>
 
-            <!-- GAME LAYOUT -->
             <div class="game-layout">
-                <!-- LEFT MATRIX 1-75 -->
                 <div class="left-matrix">
                     <div class="bingo-cols">
                         <div class="b-header b-h-b">B</div><div class="b-header b-h-i">I</div><div class="b-header b-h-n">N</div><div class="b-header b-h-g">G</div><div class="b-header b-h-o">O</div>
@@ -153,7 +138,6 @@
                     <div class="matrix-cells" id="matrix-75"></div>
                 </div>
 
-                <!-- RIGHT CALL PANEL -->
                 <div class="right-panel">
                     <div class="history-calls" id="history-balls"></div>
 
@@ -220,7 +204,6 @@
         </div>
     </div>
 
-    <!-- NAVIGATION TABS -->
     <div class="nav-bar">
         <div class="nav-item active" onclick="switchTab('game', this)"><div class="nav-icon">🎮</div>GAME</div>
         <div class="nav-item" onclick="switchTab('scores', this)"><div class="nav-icon">🏆</div>SCORES</div>
@@ -231,7 +214,7 @@
 
     <script>
         // ----------------------------------------------------
-        // 📌 [መስመር 44] እዚህ ጋር የቦትህን Username (ያለ @) አስገባ!
+        // 📌 [መስመር 228] እዚህ ጋር የቦትህን Username (ያለ @) አስገባ!
         // ----------------------------------------------------
         const BOT_USERNAME = "safariibingobot"; 
         // ----------------------------------------------------
@@ -245,8 +228,7 @@
             document.getElementById('tg-user-id').innerText = userId;
         }
 
-        // Setup Invite Link in Profile tab
-        let inviteLink = `https://t.me/${BOT_USERNAME}?start=ref_${userId}`;
+        let inviteLink = `https://t.me/${safariibingobot}?start=ref_${userId}`;
         document.getElementById('my-ref-link').value = inviteLink;
 
         function shareInviteLink() {
@@ -260,6 +242,11 @@
         let occupiedCartels = []; 
         let currentFakeWinnerIndex = 0;
         let gameLoopTimer = null;
+        let countdownTimer = null;
+        let botSelectionTimer = null;
+        let timeLeft = 30;
+
+        let drawnBallsHistory = [];
 
         const fakeWinners = [
             { name: "አዲሱ", prize: 850, cartelNo: 14 },
@@ -275,15 +262,17 @@
         }
         function closeAlert() { document.getElementById('alertModal').style.display = 'none'; }
 
+        // 🔊 Male Voice Synthesis (የወንድ ድምፅ)
         function speakMaleVoice(text) {
             if ('speechSynthesis' in window) {
                 window.speechSynthesis.cancel();
                 let msg = new SpeechSynthesisUtterance(text);
+                msg.lang = 'en-US'; // Numbers sound clearer in EN, works well in Telegram
                 let voices = window.speechSynthesis.getVoices();
-                let maleVoice = voices.find(v => v.name.includes('Male') || v.name.includes('David') || v.name.includes('George'));
+                let maleVoice = voices.find(v => v.name.includes('Male') || v.name.includes('David') || v.name.includes('George') || v.name.includes('Google US English'));
                 if (maleVoice) msg.voice = maleVoice;
-                msg.rate = 0.85;
-                msg.pitch = 0.9;
+                msg.rate = 0.9;
+                msg.pitch = 0.75; // Lower pitch for male voice feel
                 window.speechSynthesis.speak(msg);
             }
         }
@@ -303,9 +292,12 @@
             }
 
             render250SelectionGrid();
+            startSelectionCountdown();
         }
 
         function backToHome() {
+            clearInterval(countdownTimer);
+            clearInterval(botSelectionTimer);
             document.getElementById('screen-select-cartel').style.display = 'none';
             document.getElementById('screen-home').style.display = 'block';
             selectedCartels = [];
@@ -317,6 +309,7 @@
             for (let i = 1; i <= 250; i++) {
                 let cell = document.createElement('div');
                 cell.className = 'num-cell';
+                cell.id = `cell-250-${i}`;
                 cell.innerText = i;
 
                 if (occupiedCartels.includes(i)) {
@@ -338,10 +331,46 @@
             }
         }
 
+        // Gradual Bot Selection during 30s Countdown
+        function startSelectionCountdown() {
+            timeLeft = 30;
+            let availableFreeCells = [];
+            for(let i=1; i<=250; i++) {
+                if(!occupiedCartels.includes(i)) availableFreeCells.push(i);
+            }
+            // Shuffle free cells for random bot selection
+            availableFreeCells.sort(() => Math.random() - 0.5);
+            let botPickCount = 0;
+
+            countdownTimer = setInterval(() => {
+                timeLeft--;
+                document.getElementById('selection-status').innerText = `ጨዋታ ሊጀመር ${timeLeft} ሰከንድቀረ`;
+                document.getElementById('start-game-btn').innerText = `▶ ጨዋታውን ጀምር (${timeLeft}s)`;
+
+                // Slowly pick cells over the 30 seconds to look real
+                if(botPickCount < 40 && availableFreeCells.length > 0 && timeLeft % 1 === 0) {
+                    let cellToPick = availableFreeCells.pop();
+                    let el = document.getElementById(`cell-250-${cellToPick}`);
+                    if(el && !el.classList.contains('my-choice')) {
+                        el.classList.add('bot-picking');
+                        setTimeout(() => { el.classList.remove('bot-picking'); el.classList.add('taken'); }, 800);
+                        botPickCount++;
+                    }
+                }
+
+                if (timeLeft <= 0) {
+                    clearInterval(countdownTimer);
+                    confirmAndStartGame();
+                }
+            }, 1000);
+        }
+
         function confirmAndStartGame() {
+            clearInterval(countdownTimer);
             let totalCost = selectedCartels.length * 10;
             if (selectedCartels.length > 0 && balance < totalCost) {
                 showAlert(`በቂ ሂሳብ የለም! የመረጧቸውን ${selectedCartels.length} ካርቴላ ለመጫወት ${totalCost} ብር ያስፈልጋል።`);
+                backToHome();
                 return;
             }
 
@@ -367,17 +396,19 @@
             }
 
             const watchingBox = document.getElementById('watching-or-card');
+            let userCartelNum = selectedCartels.length > 0 ? selectedCartels[0] : 12;
+            
             if (selectedCartels.length === 0) {
                 watchingBox.innerHTML = `
                     <div style="font-size:14px; font-weight:900; color:#fff; margin-bottom:8px;">WATCHING ONLY</div>
                     <div style="font-size:10px; color:#857ca6; line-height:1.3;">የዚህ ዙር ጨዋታ ተጀምሯል። አዲስ ዙር እስኪጀምር እዚህ ይጠበቁ።</div>`;
             } else {
-                watchingBox.innerHTML = `<div style="font-size:11px; font-weight:bold; color:#00d26a; margin-bottom:4px;">የእርስዎ ካርቴላ #${selectedCartels[0]}</div><div class="cartel-5x5" id="my-cartel-5x5"></div>`;
-                render5x5Card('my-cartel-5x5');
+                watchingBox.innerHTML = `<div style="font-size:11px; font-weight:bold; color:#00d26a; margin-bottom:4px;">የእርስዎ ካርቴላ #${userCartelNum}</div><div class="cartel-5x5" id="my-cartel-5x5"></div>`;
+                render5x5Card('my-cartel-5x5', []);
             }
 
             let winner = fakeWinners[currentFakeWinnerIndex];
-            let drawnBalls = [];
+            drawnBallsHistory = [];
             let callCount = 0;
 
             gameLoopTimer = setInterval(() => {
@@ -386,13 +417,13 @@
 
                 let ballNum;
                 if (callCount === 14) {
-                    ballNum = 47;
+                    ballNum = 47; // winning trigger ball
                 } else {
                     ballNum = Math.floor(Math.random() * 75) + 1;
-                    while (drawnBalls.includes(ballNum)) ballNum = Math.floor(Math.random() * 75) + 1;
+                    while (drawnBallsHistory.includes(ballNum)) ballNum = Math.floor(Math.random() * 75) + 1;
                 }
 
-                drawnBalls.push(ballNum);
+                drawnBallsHistory.push(ballNum);
 
                 let letter = "B";
                 if (ballNum >= 16 && ballNum <= 30) letter = "I";
@@ -403,12 +434,17 @@
                 let ballStr = `${letter}-${ballNum}`;
 
                 document.getElementById('current-ball-text').innerText = ballStr;
-                speakMaleVoice(`${letter}... ${ballNum}`);
+                speakMaleVoice(`${letter} ${ballNum}`);
 
                 let cellElem = document.getElementById(`m-cell-${ballNum}`);
                 if (cellElem) {
                     if (ballNum % 2 === 0) cellElem.classList.add('drawn-green');
                     else cellElem.classList.add('drawn-orange');
+                }
+
+                // Update user cartel markings dynamically based on called balls
+                if (selectedCartels.length > 0) {
+                    render5x5Card('my-cartel-5x5', drawnBallsHistory);
                 }
 
                 let histBox = document.getElementById('history-balls');
@@ -422,22 +458,29 @@
                 if (callCount >= 14) {
                     clearInterval(gameLoopTimer);
                     setTimeout(() => {
-                        speakMaleVoice("BINGO!");
+                        speakMaleVoice("Bingo!");
                         showBingoWinModal(winner);
                     }, 1000);
                 }
             }, 2000);
         }
 
-        function render5x5Card(containerId) {
+        function render5x5Card(containerId, drawnList) {
             const container = document.getElementById(containerId);
+            if(!container) return;
             container.innerHTML = '';
+            
+            // Sample fixed card numbers layout
             let sampleNums = [12,16,38,49,66, 3,20,45,46,69, 2,25,'★',57,63, 9,28,40,58,70, 4,23,35,53,74];
             sampleNums.forEach((n) => {
                 let cell = document.createElement('div');
                 cell.className = 'c-cell';
-                if (n === '★') cell.className += ' star';
-                else if ([12,20,58,74,49,66].includes(n)) cell.className += ' marked';
+                if (n === '★') {
+                    cell.className += ' star';
+                } else if (drawnList.includes(n)) {
+                    // Only mark if the ball has actually been drawn in the game!
+                    cell.className += ' marked';
+                }
                 cell.innerText = n;
                 container.appendChild(cell);
             });
@@ -446,15 +489,24 @@
         function showBingoWinModal(winner) {
             document.getElementById('winner-name-txt').innerText = `${winner.name} Won!`;
             document.getElementById('winner-cartel-txt').innerText = `CARTEL NO #${winner.cartelNo}`;
-            render5x5Card('win-cartel-board');
+            render5x5Card('win-cartel-board', [12,16,38,49,66,3,20,45,46,69,2,25,57,63,9,28,40,58,70,4,23,35,53,74]);
             document.getElementById('bingoWinModal').style.display = 'flex';
 
             currentFakeWinnerIndex = (currentFakeWinnerIndex + 1) % fakeWinners.length;
 
-            setTimeout(() => {
-                document.getElementById('bingoWinModal').style.display = 'none';
-                leaveGame();
-            }, 5000);
+            // 30 Seconds countdown before next game popup closes and resets
+            let winTimerLeft = 30;
+            let winInterval = setInterval(() => {
+                winTimerLeft--;
+                let timerTxt = document.getElementById('next-game-timer-txt');
+                if(timerTxt) timerTxt.innerText = `NEXT GAME IN ${winTimerLeft}S`;
+
+                if (winTimerLeft <= 0) {
+                    clearInterval(winInterval);
+                    document.getElementById('bingoWinModal').style.display = 'none';
+                    leaveGame();
+                }
+            }, 1000);
         }
 
         function leaveGame() {
