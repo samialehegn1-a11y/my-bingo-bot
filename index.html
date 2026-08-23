@@ -229,7 +229,7 @@
         // ----------------------------------------------------
         // 📌 [መስመር 236] እዚህ ጋር የቦትህን Username (ያለ @) አስገባ!
         // ----------------------------------------------------
-        const BOT_USERNAME = "SafariBingoBot"; 
+        const BOT_USERNAME = "safariibingobot"; 
         // ----------------------------------------------------
 
         const tg = window.Telegram.WebApp;
@@ -251,6 +251,9 @@
         }
 
         let balance = 20;
+        let playedGamesCount = 0;
+        let wonGamesCount = 0;
+
         let selectedCartels = [];
         let occupiedCartels = []; 
         let currentFakeWinnerIndex = 0;
@@ -268,6 +271,32 @@
             { name: "መክሊት", prize: 630, cartelNo: 89 }
         ];
 
+        // 5x5 Cartel numbers layout with BINGO line pattern
+        const sampleCartelNumbers = [
+            12, 16, 38, 49, 66,
+             3, 20, 45, 46, 69,
+             2, 25, '★', 57, 63,
+             9, 28, 40, 58, 70,
+             4, 23, 35, 53, 74
+        ];
+
+        // Horizontal, Vertical, Diagonal, and 4 Corners BINGO patterns
+        const bingoWinningPatterns = [
+            [0, 1, 2, 3, 4], [5, 6, 7, 8, 9], [10, 11, 12, 13, 14], [15, 16, 17, 18, 19], [20, 21, 22, 23, 24], // Rows
+            [0, 5, 10, 15, 20], [1, 6, 11, 16, 21], [2, 7, 12, 17, 22], [3, 8, 13, 18, 23], [4, 9, 14, 19, 24], // Columns
+            [0, 6, 12, 18, 24], [4, 8, 12, 16, 20], // Diagonals
+            [0, 4, 20, 24] // 4 Corners
+        ];
+
+        function checkBingoPattern(drawnList) {
+            return bingoWinningPatterns.some(pattern => {
+                return pattern.every(idx => {
+                    let val = sampleCartelNumbers[idx];
+                    return val === '★' || drawnList.includes(val);
+                });
+            });
+        }
+
         function showAlert(msg) {
             document.getElementById('alertMsg').innerText = msg;
             document.getElementById('alertModal').style.display = 'flex';
@@ -281,6 +310,7 @@
         function closeWithdrawModal() {
             document.getElementById('withdrawModal').style.display = 'none';
         }
+
         function submitWithdrawal() {
             let amt = parseFloat(document.getElementById('wd-amount').value);
             let bank = document.getElementById('wd-bank').value;
@@ -290,6 +320,12 @@
                 showAlert("እባክዎን ሁሉንም የክፍያ መረጃዎች በትክክል ይሙሉ!");
                 return;
             }
+
+            if (playedGamesCount < 10 || wonGamesCount < 5) {
+                showAlert(`ገንዘብ ለማውጣት ግዴታ ቢያንስ 10 ጨዋታ መጫወት እና 5 ጨዋታ ማሸነፍ አለቦት!\n\nእስካሁን የተጫወቱት፦ ${playedGamesCount}/10\nያሸነፉት፦ ${wonGamesCount}/5`);
+                return;
+            }
+
             if (amt > balance) {
                 showAlert("ይቅርታ! በቂ ቀሪ ሂሳብ የለዎትም።");
                 return;
@@ -318,7 +354,6 @@
         }
 
         function goToCartelSelection() {
-            // Unlock Web Speech Audio context on initial user click
             speakMaleVoice("");
             if (balance < 10) { showAlert("ይቅርታ! በቂ ቀሪ ሂሳብ የለም።"); return; }
             document.getElementById('screen-home').style.display = 'none';
@@ -413,7 +448,10 @@
                 return;
             }
 
-            if (selectedCartels.length > 0) balance -= totalCost;
+            if (selectedCartels.length > 0) {
+                balance -= totalCost;
+                playedGamesCount++;
+            }
             document.getElementById('user-balance-val').innerText = balance;
             document.getElementById('wallet-balance-disp').innerText = balance + " ብር";
 
@@ -450,13 +488,16 @@
             drawnBallsHistory = [];
             let callCount = 0;
 
+            // 4.5 seconds interval for natural calling speed
             gameLoopTimer = setInterval(() => {
                 callCount++;
                 document.getElementById('called-count-val').innerText = callCount;
 
+                let winningSequence = [12, 16, 38, 49, 66];
                 let ballNum;
-                if (callCount === 14) {
-                    ballNum = 47;
+                
+                if (callCount <= winningSequence.length) {
+                    ballNum = winningSequence[callCount - 1];
                 } else {
                     ballNum = Math.floor(Math.random() * 75) + 1;
                     while (drawnBallsHistory.includes(ballNum)) ballNum = Math.floor(Math.random() * 75) + 1;
@@ -493,14 +534,21 @@
                 histBox.prepend(ballBubble);
                 if (histBox.children.length > 4) histBox.removeChild(histBox.lastChild);
 
-                if (callCount >= 14) {
+                if (checkBingoPattern(drawnBallsHistory)) {
                     clearInterval(gameLoopTimer);
                     setTimeout(() => {
                         speakMaleVoice("Bingo!");
+                        if (selectedCartels.length > 0) {
+                            wonGamesCount++;
+                            balance += winner.prize;
+                            document.getElementById('user-balance-val').innerText = balance;
+                            document.getElementById('wallet-balance-disp').innerText = balance + " ብር";
+                            winner.name = "እርስዎ (You)";
+                        }
                         showBingoWinModal(winner);
-                    }, 1000);
+                    }, 1200);
                 }
-            }, 2000);
+            }, 4500);
         }
 
         function render5x5Card(containerId, drawnList) {
@@ -508,8 +556,7 @@
             if(!container) return;
             container.innerHTML = '';
             
-            let sampleNums = [12,16,38,49,66, 3,20,45,46,69, 2,25,'★',57,63, 9,28,40,58,70, 4,23,35,53,74];
-            sampleNums.forEach((n) => {
+            sampleCartelNumbers.forEach((n) => {
                 let cell = document.createElement('div');
                 cell.className = 'c-cell';
                 if (n === '★') {
@@ -525,7 +572,7 @@
         function showBingoWinModal(winner) {
             document.getElementById('winner-name-txt').innerText = `${winner.name} Won!`;
             document.getElementById('winner-cartel-txt').innerText = `CARTEL NO #${winner.cartelNo}`;
-            render5x5Card('win-cartel-board', [12,16,38,49,66,3,20,45,46,69,2,25,57,63,9,28,40,58,70,4,23,35,53,74]);
+            render5x5Card('win-cartel-board', drawnBallsHistory);
             document.getElementById('bingoWinModal').style.display = 'flex';
 
             currentFakeWinnerIndex = (currentFakeWinnerIndex + 1) % fakeWinners.length;
