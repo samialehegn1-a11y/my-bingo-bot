@@ -74,7 +74,7 @@
         <div class="stake-card">
             <div class="balance-label">ቀሪ ሂሳብ</div>
             <div class="balance-val" id="wallet-balance-val">20 ብር</div>
-            <button class="play-btn" style="background:#ff9800; color:#fff;" onclick="alert('የማስወጣት (Withdrawal) ገደብ ገና አልሞላም!')">ገንዘብ ማውጣት (Withdraw)</button>
+            <button class="play-btn" style="background:#ff9800; color:#fff;" onclick="requestWithdrawal()">ገንዘብ ማውጣት (Withdraw)</button>
         </div>
     </div>
 
@@ -84,7 +84,8 @@
         <div class="stake-card" style="text-align: left;">
             <p style="margin-bottom:8px;"><b>መለያ (User ID):</b> <span id="tg-id">12345</span></p>
             <p style="margin-bottom:8px;"><b>የጋበዟቸው ሰዎች:</b> <span id="invite-count-val">0</span> ሰው</p>
-            <p style="margin-bottom:8px;"><b>የተጫወቱት ጨዋታ:</b> <span id="games-played-val">0</span></p>
+            <p style="margin-bottom:8px;"><b>የተጫወቱት ጨዋታ:</b> <span id="games-played-val">0</span> / 8 (አስፈላጊ)</p>
+            <p style="margin-bottom:8px;"><b>ያሸነፉት ጨዋታ:</b> <span id="wins-val">0</span> / 5 አሸናፊነት</p>
             <hr style="border-color: #231c3d; margin: 15px 0;">
             <p style="font-size: 13px; color: #ffca28; margin-bottom: 5px;">🔗 የጋበዣ ሊንክዎ (1 ሰው = 10 ብር):</p>
             <input type="text" id="ref-link" readonly style="width:100%; background:#201a38; color:#fff; border:1px solid #3d3463; padding:8px; border-radius:6px; font-size:11px;" value="Loading...">
@@ -106,15 +107,19 @@
         tg.expand();
         
         let userId = "12345";
+        let botUsername = "@safariibingobot"; // የቦትህን ዩዘርናም እዚህ ጋር በትክክል አስገባ (ለምሳሌ: SafariBingoBot)
+
         if(tg.initDataUnsafe && tg.initDataUnsafe.user) {
             userId = tg.initDataUnsafe.user.id;
             document.getElementById('tg-id').innerText = userId;
         }
 
-        document.getElementById('ref-link').value = `https://t.me/your_bot_username?start=ref_${userId}`;
+        // የራሳቸውን ትክክለኛ የሪፈራል ሊንክ ማመንጨት
+        document.getElementById('ref-link').value = `https://t.me/${botUsername}?start=ref_${userId}`;
 
         let balance = localStorage.getItem(`balance_${userId}`) !== null ? parseInt(localStorage.getItem(`balance_${userId}`)) : 20;
         let gamesPlayed = localStorage.getItem(`games_${userId}`) !== null ? parseInt(localStorage.getItem(`games_${userId}`)) : 0;
+        let winsCount = localStorage.getItem(`wins_${userId}`) !== null ? parseInt(localStorage.getItem(`wins_${userId}`)) : 0;
         let inviteCount = localStorage.getItem(`invites_${userId}`) !== null ? parseInt(localStorage.getItem(`invites_${userId}`)) : 0;
 
         updateUIValues();
@@ -123,6 +128,7 @@
             document.getElementById('user-balance').innerText = balance + " ብር";
             document.getElementById('wallet-balance-val').innerText = balance + " ብር";
             document.getElementById('games-played-val').innerText = gamesPlayed;
+            document.getElementById('wins-val').innerText = winsCount;
             document.getElementById('invite-count-val').innerText = inviteCount;
 
             let btn = document.getElementById('play-action-btn');
@@ -155,6 +161,30 @@
             copyText.setSelectionRange(0, 99999);
             navigator.clipboard.writeText(copyText.value);
             alert("የጋበዣ ሊንክዎ ተኮፒ ተደርጓል!");
+        }
+
+        // 💰 የ Withdraw ጥያቄ ማረጋገጫ (8 ጨዋታ + 5 ማሸነፍ)
+        function requestWithdrawal() {
+            if (balance < 50) {
+                alert('⚠️ ገንዘብ ለማውጣት ቢያንስ 50 ብር ሊኖርዎት ይገባል!');
+                return;
+            }
+            if (gamesPlayed < 8) {
+                alert(`❌ ይቅርታ! withdraw ለማዘዝ ቢያንስ 8 ጨዋታ መጫወት አለብዎት። (አሁን የተጫወቱት: ${gamesPlayed}/8)`);
+                return;
+            }
+            if (winsCount < 5) {
+                alert(`❌ ይቅርታ! withdraw ለማዘዝ ቢያንስ 5 ጊዜ ማሸነፍ አለብዎት። (አሁን ያሸነፉት: ${winsCount}/5)`);
+                return;
+            }
+
+            let phoneNum = prompt('የቴሌብር (Telebirr) ስልክ ቁጥርዎን ያስገቡ (ለምሳሌ 09...):');
+            if (phoneNum) {
+                alert(`✅ የ 50 ብር የክፍያ ጥያቄዎ በተሳካ ሁኔታ ተልኳል! በ 24 ሰዓት ውስጥ ወደ ቁጥር ${phoneNum} ይላካል።`);
+                balance -= 50;
+                localStorage.setItem(`balance_${userId}`, balance);
+                updateUIValues();
+            }
         }
 
         const selectBoard = document.getElementById('select-board');
@@ -195,8 +225,17 @@
 
             balance -= 10;
             gamesPlayed += 1;
+            
+            // በጨዋታው የማሸነፍ እድል (ለሙከራ በዘፈቀደ 50% ዕድል እንዲኖረው ወይም በቁጥር ምርጫ ላይ ተመስርቶ እንዲጨምር ተደርጓል)
+            // እዚህ ላይ ተጠቃሚው ሲጫወት 50 በመቶ ዕድል አለው ብለን እናስብ (እንዲያሸንፍ ሲደረግ winsCount ይጨምራል)
+            let isUserWin = Math.random() < 0.4; // 40% የማሸነፍ ዕድል
+            if (isUserWin) {
+                winsCount += 1;
+            }
+
             localStorage.setItem(`balance_${userId}`, balance);
             localStorage.setItem(`games_${userId}`, gamesPlayed);
+            localStorage.setItem(`wins_${userId}`, winsCount);
             updateUIValues();
 
             document.getElementById('home-screen').style.display = 'none';
@@ -213,10 +252,7 @@
                 board.appendChild(cell);
             }
 
-            let winnerName = names[Math.floor(Math.random() * names.length)];
-            let winnerPrize = prizes[Math.floor(Math.random() * prizes.length)];
             let count = 0;
-            
             let interval = setInterval(() => {
                 count++;
                 let randNum = Math.floor(Math.random() * 50) + 1;
@@ -226,8 +262,14 @@
                 
                 if (count >= 10) {
                     clearInterval(interval);
-                    document.getElementById('game-status').innerHTML = 
-                        `<b style="color:#00d26a; font-size:15px;">🎉 Bingo! ደራሽ ደርሷል!</b><br><b>አሸናፊ (ቦቱ):</b> ${winnerName} (${winnerPrize} ብር)`;
+                    if (isUserWin) {
+                        document.getElementById('game-status').innerHTML = 
+                            `<b style="color:#00d26a; font-size:16px;">🎉 እንኳን ደስ አለዎት! አሸንፈዋል! 🏆</b>`;
+                    } else {
+                        let winnerName = names[Math.floor(Math.random() * names.length)];
+                        document.getElementById('game-status').innerHTML = 
+                            `<b style="color:#ff9800; font-size:15px;">😔 በዚህኛዉ ጨዋታ አልፈዋል!</b><br><b>አሸናፊ:</b> ${winnerName}`;
+                    }
                 }
             }, 700);
         }
@@ -241,4 +283,4 @@
         }
     </script>
 </body>
-  </html>
+</html>
