@@ -32,7 +32,7 @@
         .game-layout { display: flex; gap: 8px; padding: 8px; text-align: left; }
         .left-matrix { display: flex; flex-direction: column; width: 48%; background: #171131; border-radius: 12px; padding: 5px; border: 1px solid #291e4f; }
         .bingo-cols { display: grid; grid-template-columns: repeat(5, 1fr); gap: 2px; text-align: center; margin-bottom: 5px; }
-        .b-header { font-weight: 900; font-size: 11px; padding: 4px 0; border-radius: 4px; color: #fff; }
+        .b-header { font-weight: 900; font-size: 11px; padding: 6px 0; border-radius: 4px; color: #fff; }
         .b-h-b { background: #2196f3; } .b-h-i { background: #9c27b0; } .b-h-n { background: #e91e63; } .b-h-g { background: #4caf50; } .b-h-o { background: #ff9800; }
         
         .matrix-cells { display: grid; grid-template-columns: repeat(5, 1fr); grid-template-rows: repeat(15, 1fr); grid-auto-flow: column; gap: 2px; text-align: center; }
@@ -48,12 +48,12 @@
 
         .watching-box { background: #171131; border-radius: 12px; padding: 10px; flex: 1; text-align: center; border: 1px solid #291e4f; display: flex; flex-direction: column; align-items: center; justify-content: center; }
 
-        .cartel-5x5 { display: grid; grid-template-columns: repeat(5, 1fr); gap: 3px; background: #231a44; padding: 5px; border-radius: 8px; width: 100%; }
-        .c-cell { background: #fff; color: #000; font-size: 10px; font-weight: 900; padding: 6px 0; border-radius: 3px; text-align: center; }
+        .cartel-5x5 { display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; background: #110b24; padding: 6px; border-radius: 8px; width: 100%; }
+        .c-cell { background: #fff; color: #000; font-size: 11px; font-weight: 900; padding: 8px 0; border-radius: 4px; text-align: center; }
         .c-cell.marked { background: #00d26a !important; color: #000 !important; }
 
-        .bingo-modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(5, 2, 15, 0.95); z-index: 99999; align-items: center; justify-content: center; padding: 20px; }
-        .win-card { background: #181233; border: 1px solid #332766; border-radius: 20px; padding: 20px; width: 100%; max-width: 320px; text-align: center; }
+        .bingo-modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(5, 2, 15, 0.92); z-index: 99999; align-items: center; justify-content: center; padding: 20px; }
+        .win-card { background: #181233; border: 1px solid #332766; border-radius: 24px; padding: 24px 20px; width: 100%; max-width: 320px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.8); }
 
         .nav-bar { position: fixed; bottom: 0; left: 0; right: 0; background: #0a0614; display: flex; justify-around; padding: 8px 0; border-top: 1px solid #1a1233; z-index: 999; }
         .nav-item { color: #5f577d; font-size: 9px; font-weight: 800; cursor: pointer; text-align: center; flex: 1; }
@@ -64,7 +64,7 @@
         .custom-popup { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.85); z-index: 999999; justify-content: center; align-items: center; }
         .popup-box { background: #1f1838; border: 1px solid #ffca28; border-radius: 18px; padding: 20px; width: 300px; text-align: center; }
         
-        .list-item { background: #171131; border: 1px solid #291e4f; padding: 12px; border-radius: 10px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; text-align: left; }
+        .list-item { background: #171131; border: 1px solid #291e4f; padding: 12px; border-radius: 10px; margin-bottom: 8px; display: flex; justify-between; align-items: center; text-align: left; }
     </style>
 </head>
 <body>
@@ -95,17 +95,17 @@
     <!-- BINGO WIN MODAL -->
     <div id="bingoWinModal" class="bingo-modal">
         <div class="win-card">
-            <div style="font-size: 35px; margin-bottom: -5px;">👑</div>
-            <div style="font-size: 26px; font-weight: 900; color: #fff;">BINGO! 🎉</div>
-            <div style="font-size: 16px; font-weight: 800; color: #fff; margin: 5px 0 10px 0;" id="winner-name-txt">Adisu Winner 🏆</div>
-            <div style="font-size: 11px; font-weight: 800; color: #ff9800; margin-bottom: 10px;" id="winner-cartel-txt">CARTEL NO #14</div>
+            <div style="font-size: 38px; margin-bottom: -5px;">👑</div>
+            <div style="font-size: 26px; font-weight: 900; color: #fff; letter-spacing: 1px;">BINGO! 🎉</div>
+            <div style="font-size: 16px; font-weight: 800; color: #fff; margin: 4px 0 8px 0;" id="winner-name-txt">እርስዎ (You) Won!</div>
+            <div style="font-size: 11px; font-weight: 800; color: #ffca28; margin-bottom: 12px; letter-spacing: 0.5px;" id="winner-cartel-txt">CARTEL NO #14</div>
             
             <div class="bingo-cols">
                 <div class="b-header b-h-b">B</div><div class="b-header b-h-i">I</div><div class="b-header b-h-n">N</div><div class="b-header b-h-g">G</div><div class="b-header b-h-o">O</div>
             </div>
             <div class="cartel-5x5" id="win-cartel-board"></div>
             
-            <div style="font-size: 10px; color: #786f99; margin-top: 15px; font-weight: 700;">NEXT GAME IN FEW SECONDS</div>
+            <div style="font-size: 10px; color: #8880a6; margin-top: 15px; font-weight: 700; letter-spacing: 0.5px;">NEXT GAME IN <span id="win-modal-timer" style="color:#ffca28;">10</span>S</div>
         </div>
     </div>
 
@@ -293,7 +293,6 @@
             if (!container) return;
             container.innerHTML = '';
             
-            // የዛሬ አሸናፊዎች ዝርዝር እንደ ተራው የደራሽ መጠን
             const scoresData = [
                 { name: "Adisu Winner 🏆", gameId: "9812", prize: 850 },
                 { name: "Ela Winner 🏆", gameId: "9811", prize: 750 },
@@ -336,8 +335,9 @@
         updateBalanceUI();
 
         const WAITING_TIME = 30;
-        const GAME_TIME = 100;
-        const CYCLE_TIME = WAITING_TIME + GAME_TIME;
+        const WIN_DISPLAY_TIME = 10; // አሸናፊው ከገጽ ላይ የሚቆይበት ሰከንድ
+        const DRAW_TIME = 80;
+        const CYCLE_TIME = WAITING_TIME + DRAW_TIME + WIN_DISPLAY_TIME;
 
         let localJoinedGame = false;
         let selectedCartelNumber = null;
@@ -384,9 +384,11 @@
             return numbers;
         }
 
+        // የቢንጎ ማሸነፊያ ሕግ ማረጋገጫ (ትክክለኛ አግድም፣ ဒေါင်လိုက် ወይም ዲያጎናል መስመር መሙላቱን ያረጋግጣል)
         function checkBingoWin(cartelNumbers, drawnList) {
             let isMarked = (val) => val === '★' || drawnList.includes(val);
 
+            // Row check
             for (let r = 0; r < 5; r++) {
                 let rowWin = true;
                 for (let c = 0; c < 5; c++) {
@@ -395,6 +397,7 @@
                 if (rowWin) return true;
             }
 
+            // Column check
             for (let c = 0; c < 5; c++) {
                 let colWin = true;
                 for (let r = 0; r < 5; r++) {
@@ -403,10 +406,43 @@
                 if (colWin) return true;
             }
 
+            // Diagonal check 1
             if (isMarked(cartelNumbers[0]) && isMarked(cartelNumbers[6]) && isMarked(cartelNumbers[12]) && isMarked(cartelNumbers[18]) && isMarked(cartelNumbers[24])) return true;
+            
+            // Diagonal check 2
             if (isMarked(cartelNumbers[4]) && isMarked(cartelNumbers[8]) && isMarked(cartelNumbers[12]) && isMarked(cartelNumbers[16]) && isMarked(cartelNumbers[20])) return true;
 
             return false;
+        }
+
+        // አሸናፊ የሆነበትን የመጀመሪያ ተርታ ለማወቅ የሚያገለግል ድጋፊ ፋንክሽን
+        function getFirstWinningPattern(cartelNumbers, drawnList) {
+            let isMarked = (val) => val === '★' || drawnList.includes(val);
+
+            for (let r = 0; r < 5; r++) {
+                let rowWin = true;
+                for (let c = 0; c < 5; c++) {
+                    if (!isMarked(cartelNumbers[r * 5 + c])) rowWin = false;
+                }
+                if (rowWin) return { type: 'row', index: r };
+            }
+
+            for (let c = 0; c < 5; c++) {
+                let colWin = true;
+                for (let r = 0; r < 5; r++) {
+                    if (!isMarked(cartelNumbers[r * 5 + c])) colWin = false;
+                }
+                if (colWin) return { type: 'col', index: c };
+            }
+
+            if (isMarked(cartelNumbers[0]) && isMarked(cartelNumbers[6]) && isMarked(cartelNumbers[12]) && isMarked(cartelNumbers[18]) && isMarked(cartelNumbers[24])) {
+                return { type: 'diag', index: 1 };
+            }
+            if (isMarked(cartelNumbers[4]) && isMarked(cartelNumbers[8]) && isMarked(cartelNumbers[12]) && isMarked(cartelNumbers[16]) && isMarked(cartelNumbers[20])) {
+                return { type: 'diag', index: 2 };
+            }
+
+            return null;
         }
 
         function getGlobalState() {
@@ -415,9 +451,14 @@
             let timeInCycle = nowSec % CYCLE_TIME;
 
             let isWaitingPhase = timeInCycle < WAITING_TIME;
-            let phaseTimeLeft = isWaitingPhase ? (WAITING_TIME - timeInCycle) : (CYCLE_TIME - timeInCycle);
+            let isDrawingPhase = timeInCycle >= WAITING_TIME && timeInCycle < (WAITING_TIME + DRAW_TIME);
+            let isWinShowPhase = timeInCycle >= (WAITING_TIME + DRAW_TIME);
 
-            // 10 ዙሮች በየተራ ይሽከረከራሉ
+            let phaseTimeLeft = 0;
+            if (isWaitingPhase) phaseTimeLeft = WAITING_TIME - timeInCycle;
+            else if (isDrawingPhase) phaseTimeLeft = (WAITING_TIME + DRAW_TIME) - timeInCycle;
+            else phaseTimeLeft = CYCLE_TIME - timeInCycle;
+
             let configIndex = cycleIndex % gameConfigs.length;
             let currentConfig = gameConfigs[configIndex];
 
@@ -426,7 +467,7 @@
 
             let drawnBallsList = [];
             let seed = cycleIndex * 7777;
-            while(drawnBallsList.length < 40) {
+            while(drawnBallsList.length < 50) {
                 let r = Math.floor(seededRandom(seed++) * 75) + 1;
                 if(!drawnBallsList.includes(r)) {
                     drawnBallsList.push(r);
@@ -436,6 +477,8 @@
             return {
                 cycleIndex,
                 isWaitingPhase,
+                isDrawingPhase,
+                isWinShowPhase,
                 phaseTimeLeft,
                 timeInCycle,
                 winnerName,
@@ -461,6 +504,7 @@
             if (state.isWaitingPhase) {
                 mainBtn.disabled = false;
                 mainBtn.innerHTML = `▶ PLAY 10 ( <span id="main-timer-display">${state.phaseTimeLeft}</span> s)`;
+                document.getElementById('bingoWinModal').style.display = 'none';
             } else {
                 mainBtn.disabled = false;
                 mainBtn.innerHTML = `▶ በጨዋታ ላይ... (ለመመልከት ይጫኑ)`;
@@ -523,7 +567,6 @@
             }
         }
 
-        // ቦቱ በተሰጠው የካርቴላ መጠን (botCartels Target) መሰረት በ30 ሰኮንድ ውስጥ አስመስሎ እንዲመርጥ
         function startFakeBotSelection(seed, targetBotCartels) {
             if (fakeBotSelectionTimer) clearInterval(fakeBotSelectionTimer);
             let takenCount = 0;
@@ -592,8 +635,8 @@
             document.getElementById('players-val').innerText = state.config.players;
             document.getElementById('derash-val').innerText = state.config.derash;
 
-            let secondsInGame = state.timeInCycle - WAITING_TIME;
-            let calledCount = Math.min(35, Math.floor(secondsInGame / 3.5) + 1);
+            let secondsInGame = Math.max(0, state.timeInCycle - WAITING_TIME);
+            let calledCount = Math.min(35, Math.floor(secondsInGame / 2.2) + 1);
 
             document.getElementById('called-count-val').innerText = calledCount;
 
@@ -629,15 +672,16 @@
                 histBox.appendChild(ballBubble);
             });
 
+            // 1. ተጫዋች ካርቴላ መርጦ ከተጫወተ
             if (localJoinedGame) {
                 render5x5Board('my-cartel-5x5', myCartelNumbers, drawnSoFar);
 
                 let userWon = checkBingoWin(myCartelNumbers, drawnSoFar);
 
-                if ((userWon || calledCount >= 30) && currentRecordedGameId !== state.gameId) {
+                if ((userWon || state.isWinShowPhase) && currentRecordedGameId !== state.gameId) {
                     currentRecordedGameId = state.gameId;
 
-                    let winnerName = userWon ? currentUserName + " (እርስዎ) 🏆" : state.winnerName;
+                    let winnerText = userWon ? "እርስዎ (You) Won!" : state.winnerName;
                     let winningCartel = userWon ? myCartelNumbers : generateCartelForId((state.cycleIndex % 200) + 1, state.seed);
                     let winCartelNum = userWon ? selectedCartelNumber : ((state.cycleIndex % 200) + 1);
 
@@ -654,17 +698,23 @@
                     });
 
                     updateBalanceUI();
-                    showBingoWinModal(winnerName, winCartelNum, winningCartel, drawnSoFar);
+                    showBingoWinModal(winnerText, winCartelNum, winningCartel, drawnSoFar);
                 }
             } else {
+                // 2. ብር ሳይኖር ወይም ዝም ብሎ ተመልካች ከሆነ
                 let winCartelNum = ((state.cycleIndex % 200) + 1);
                 let winCartelNums = generateCartelForId(winCartelNum, state.seed);
                 render5x5Board('watching-cartel-5x5', winCartelNums, drawnSoFar);
 
-                if (calledCount >= 30 && currentRecordedGameId !== state.gameId) {
+                if (state.isWinShowPhase && currentRecordedGameId !== state.gameId) {
                     currentRecordedGameId = state.gameId;
                     showBingoWinModal(state.winnerName, winCartelNum, winCartelNums, drawnSoFar);
                 }
+            }
+
+            // የ 10 ሰከንድ አሸናፊ ማሳያ ቆጠራ
+            if (state.isWinShowPhase) {
+                document.getElementById('win-modal-timer').innerText = state.phaseTimeLeft;
             }
         }
 
@@ -672,13 +722,30 @@
             const container = document.getElementById(containerId);
             if(!container || !cartelNums || cartelNums.length === 0) return;
             container.innerHTML = '';
-            
-            cartelNums.forEach((n) => {
+
+            let winningPattern = getFirstWinningPattern(cartelNums, drawnList);
+
+            cartelNums.forEach((n, idx) => {
                 let cell = document.createElement('div');
                 cell.className = 'c-cell';
-                if (n === '★' || drawnList.includes(n)) {
+
+                let row = Math.floor(idx / 5);
+                let col = idx % 5;
+                let isWinningCell = false;
+
+                if (winningPattern) {
+                    if (winningPattern.type === 'row' && row === winningPattern.index) isWinningCell = true;
+                    if (winningPattern.type === 'col' && col === winningPattern.index) isWinningCell = true;
+                    if (winningPattern.type === 'diag' && winningPattern.index === 1 && row === col) isWinningCell = true;
+                    if (winningPattern.type === 'diag' && winningPattern.index === 2 && (row + col === 4)) isWinningCell = true;
+                }
+
+                if (isWinningCell) {
+                    cell.classList.add('marked');
+                } else if (n === '★') {
                     cell.classList.add('marked');
                 }
+
                 cell.innerText = n;
                 container.appendChild(cell);
             });
