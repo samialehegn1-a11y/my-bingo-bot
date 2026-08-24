@@ -35,7 +35,8 @@
         .b-header { font-weight: 900; font-size: 11px; padding: 4px 0; border-radius: 4px; color: #fff; }
         .b-h-b { background: #2196f3; } .b-h-i { background: #9c27b0; } .b-h-n { background: #e91e63; } .b-h-g { background: #4caf50; } .b-h-o { background: #ff9800; }
         
-        .matrix-cells { display: grid; grid-template-columns: repeat(5, 1fr); gap: 2px; text-align: center; }
+        /* 15 ረድፎች እንዲሆኑ የተደረገ የቁጥሮች ማቀናበሪያ */
+        .matrix-cells { display: grid; grid-template-columns: repeat(5, 1fr); grid-template-rows: repeat(15, 1fr); grid-auto-flow: column; gap: 2px; text-align: center; }
         .m-cell { background: #241c42; color: #8e84b0; font-size: 10px; font-weight: 700; padding: 5px 0; border-radius: 3px; }
         .m-cell.drawn { background: #00d26a !important; color: #000 !important; font-weight: 900; }
 
@@ -97,7 +98,7 @@
         <div class="win-card">
             <div style="font-size: 35px; margin-bottom: -5px;">👑</div>
             <div style="font-size: 26px; font-weight: 900; color: #fff;">BINGO! 🎉</div>
-            <div style="font-size: 16px; font-weight: 800; color: #fff; margin: 5px 0 10px 0;" id="winner-name-txt">አዲሱ አሸንፏል!</div>
+            <div style="font-size: 16px; font-weight: 800; color: #fff; margin: 5px 0 10px 0;" id="winner-name-txt">Adisu Winner 🏆</div>
             <div style="font-size: 11px; font-weight: 800; color: #ff9800; margin-bottom: 10px;" id="winner-cartel-txt">CARTEL NO #14</div>
             
             <div class="bingo-cols">
@@ -137,10 +138,10 @@
         <!-- ACTIVE GAME -->
         <div id="screen-active-game" style="display: none;">
             <div class="top-stats">
-                <div class="stat-box"><div class="stat-lbl">Game ID</div><div class="stat-val" style="font-size:10px;">DB0DG8HF</div></div>
-                <div class="stat-box"><div class="stat-lbl">Players</div><div class="stat-val" id="players-val">80</div></div>
+                <div class="stat-box"><div class="stat-lbl">Game ID</div><div class="stat-val" id="game-id-val" style="font-size:10px;">DB0DG8HF</div></div>
+                <div class="stat-box"><div class="stat-lbl">Players</div><div class="stat-val" id="players-val">90</div></div>
                 <div class="stat-box"><div class="stat-lbl">Bet</div><div class="stat-val">10</div></div>
-                <div class="stat-box"><div class="stat-lbl">Derash</div><div class="stat-val" id="derash-val">800</div></div>
+                <div class="stat-box"><div class="stat-lbl">Derash</div><div class="stat-val" id="derash-val">850</div></div>
                 <div class="stat-box"><div class="stat-lbl">Called</div><div class="stat-val" id="called-count-val">0</div></div>
             </div>
 
@@ -196,11 +197,11 @@
     <div id="tab-scores" class="tab-screen">
         <div style="font-size:16px; font-weight:bold; color:#ffca28; padding:15px;">🏆 የዛሬ አሸናፊዎች ዝርዝር</div>
         <div style="padding:0 15px;">
-            <div class="list-item"><div><b>1. አዲሱ</b><br><small style="color:#786f99;">Game #9812</small></div><div style="color:#00d26a; font-weight:bold;">850 ETB</div></div>
-            <div class="list-item"><div><b>2. ኤላ</b><br><small style="color:#786f99;">Game #9811</small></div><div style="color:#00d26a; font-weight:bold;">720 ETB</div></div>
-            <div class="list-item"><div><b>3. ዳምጠው</b><br><small style="color:#786f99;">Game #9810</small></div><div style="color:#00d26a; font-weight:bold;">800 ETB</div></div>
-            <div class="list-item"><div><b>4. ዮናስ</b><br><small style="color:#786f99;">Game #9809</small></div><div style="color:#00d26a; font-weight:bold;">750 ETB</div></div>
-            <div class="list-item"><div><b>5. ሳራ</b><br><small style="color:#786f99;">Game #9808</small></div><div style="color:#00d26a; font-weight:bold;">850 ETB</div></div>
+            <div class="list-item"><div><b>1. Adisu Winner 🏆</b><br><small style="color:#786f99;">Game #9812</small></div><div style="color:#00d26a; font-weight:bold;">850 ETB</div></div>
+            <div class="list-item"><div><b>2. Ela Winner 🏆</b><br><small style="color:#786f99;">Game #9811</small></div><div style="color:#00d26a; font-weight:bold;">850 ETB</div></div>
+            <div class="list-item"><div><b>3. Damtew Winner 🏆</b><br><small style="color:#786f99;">Game #9810</small></div><div style="color:#00d26a; font-weight:bold;">850 ETB</div></div>
+            <div class="list-item"><div><b>4. Yonas Winner 🏆</b><br><small style="color:#786f99;">Game #9809</small></div><div style="color:#00d26a; font-weight:bold;">850 ETB</div></div>
+            <div class="list-item"><div><b>5. Sara Winner 🏆</b><br><small style="color:#786f99;">Game #9808</small></div><div style="color:#00d26a; font-weight:bold;">850 ETB</div></div>
         </div>
     </div>
 
@@ -271,23 +272,13 @@
         document.getElementById('invite-link-input').value = `https://t.me/SafariBingo_Bot?start=ref_${currentUserId || '12345678'}`;
         updateBalanceUI();
 
-        // Game State Variables
-        let globalTimeLeft = 30;
-        let globalTimer = null;
-        let fakeBotSelectionTimer = null;
-        let isGameRunning = false; 
-        let selectedCartelNumber = null;
-        let isWatchingOnly = false;
-        let gameLoopTimer = null;
-        let drawnBalls = [];
-
-        // Bot Winner Names & Amounts
+        // Bot Winner Names (በእንግሊዝኛ የተደረጉ አሸናፊዎች)
         const botWinners = [
-            { name: "አዲሱ", amount: 850 },
-            { name: "ኤላ", amount: 720 },
-            { name: "ዳምጠው", amount: 800 },
-            { name: "ዮናስ", amount: 750 },
-            { name: "ሳራ", amount: 850 }
+            { name: "Adisu Winner 🏆", amount: 850, players: 90 },
+            { name: "Ela Winner 🏆", amount: 850, players: 90 },
+            { name: "Damtew Winner 🏆", amount: 850, players: 90 },
+            { name: "Yonas Winner 🏆", amount: 850, players: 90 },
+            { name: "Sara Winner 🏆", amount: 850, players: 90 }
         ];
 
         const myCardNumbers = [
@@ -298,44 +289,91 @@
              4, 23, 35, 53, 74
         ];
 
-        // 30 Second Count Down Cycle
-        function start30SecTimerCycle() {
-            if (globalTimer) clearInterval(globalTimer);
-            globalTimeLeft = 30;
-            isGameRunning = false;
+        // 24/7 Global Time Sync (ሁሉም ሰው አንድ አይነት ሰዓትና ጨዋታ ያያል)
+        const WAITING_TIME = 30; // 30 sec wait
+        const GAME_TIME = 100;   // ~100 sec game duration (25 calls * 4 sec)
+        const CYCLE_TIME = WAITING_TIME + GAME_TIME; // Total 130 sec cycle
 
-            let mainBtn = document.getElementById('main-play-btn');
-            mainBtn.disabled = false;
-            mainBtn.innerHTML = `▶ PLAY 10 ( <span id="main-timer-display">${globalTimeLeft}</span> s)`;
+        let localJoinedGame = false;
+        let selectedCartelNumber = null;
+        let fakeBotSelectionTimer = null;
 
-            globalTimer = setInterval(() => {
-                if (!isGameRunning) {
-                    globalTimeLeft--;
-                    
-                    let mainTimerDisp = document.getElementById('main-timer-display');
-                    let selectTimerDisp = document.getElementById('select-timer-display');
-                    let bottomTimerDisp = document.getElementById('bottom-timer-display');
-
-                    if(mainTimerDisp) mainTimerDisp.innerText = globalTimeLeft;
-                    if(selectTimerDisp) selectTimerDisp.innerText = globalTimeLeft;
-                    if(bottomTimerDisp) bottomTimerDisp.innerText = globalTimeLeft;
-
-                    if (globalTimeLeft <= 0) {
-                        clearInterval(globalTimer);
-                        startActiveGamePhase();
-                    }
-                }
-            }, 1000);
+        // Pseudo-random generator using seed so all clients get SAME drawn numbers
+        function seededRandom(seed) {
+            let x = Math.sin(seed++) * 10000;
+            return x - Math.floor(x);
         }
 
-        start30SecTimerCycle();
+        function getGlobalState() {
+            let nowSec = Math.floor(Date.now() / 1000);
+            let cycleIndex = Math.floor(nowSec / CYCLE_TIME);
+            let timeInCycle = nowSec % CYCLE_TIME;
 
-        // Navigation & Home Logic
+            let isWaitingPhase = timeInCycle < WAITING_TIME;
+            let phaseTimeLeft = isWaitingPhase ? (WAITING_TIME - timeInCycle) : (CYCLE_TIME - timeInCycle);
+
+            let winnerObj = botWinners[cycleIndex % botWinners.length];
+            let gameId = "DB" + (100000 + (cycleIndex % 899999));
+
+            // Generate deterministic 25 drawn numbers for the current game
+            let drawnBallsList = [];
+            let seed = cycleIndex * 7777;
+            while(drawnBallsList.length < 25) {
+                let r = Math.floor(seededRandom(seed++) * 75) + 1;
+                if(!drawnBallsList.includes(r)) {
+                    drawnBallsList.push(r);
+                }
+            }
+
+            return {
+                cycleIndex,
+                isWaitingPhase,
+                phaseTimeLeft,
+                timeInCycle,
+                winnerObj,
+                gameId,
+                drawnBallsList
+            };
+        }
+
+        // Global Tick Loop (Every Second)
+        setInterval(() => {
+            let state = getGlobalState();
+
+            // Update Wait Timers
+            let mainTimerDisp = document.getElementById('main-timer-display');
+            let selectTimerDisp = document.getElementById('select-timer-display');
+            let bottomTimerDisp = document.getElementById('bottom-timer-display');
+
+            if(mainTimerDisp) mainTimerDisp.innerText = state.isWaitingPhase ? state.phaseTimeLeft : 0;
+            if(selectTimerDisp) selectTimerDisp.innerText = state.isWaitingPhase ? state.phaseTimeLeft : 0;
+            if(bottomTimerDisp) bottomTimerDisp.innerText = state.isWaitingPhase ? state.phaseTimeLeft : 0;
+
+            let mainBtn = document.getElementById('main-play-btn');
+            if (state.isWaitingPhase) {
+                mainBtn.disabled = false;
+                mainBtn.innerHTML = `▶ PLAY 10 ( <span id="main-timer-display">${state.phaseTimeLeft}</span> s)`;
+            } else {
+                mainBtn.disabled = false;
+                mainBtn.innerHTML = `▶ በጨዋታ ላይ... (ለመመልከት ይጫኑ)`;
+            }
+
+            // Sync Active Game Phase
+            if (!state.isWaitingPhase && (localJoinedGame || document.getElementById('screen-active-game').style.display === 'block')) {
+                updateActiveGameUI(state);
+            } else if (state.isWaitingPhase && document.getElementById('screen-active-game').style.display === 'block') {
+                // Game finished, return home
+                leaveGameUI();
+            }
+        }, 1000);
+
         function joinGameQueue() {
-            if (isGameRunning) {
+            let state = getGlobalState();
+
+            if (!state.isWaitingPhase) {
                 // ከሆነ በጨዋታ ላይ ገብተው መመልከት ብቻ ይችላሉ
-                isWatchingOnly = true;
-                showActiveGameScreen();
+                localJoinedGame = false;
+                showActiveGameScreen(true);
                 return;
             }
 
@@ -346,7 +384,7 @@
             playedGamesCount++;
             updateBalanceUI();
 
-            isWatchingOnly = false;
+            localJoinedGame = true;
             document.getElementById('screen-home').style.display = 'none';
             document.getElementById('screen-select-cartel').style.display = 'block';
 
@@ -360,7 +398,6 @@
             document.getElementById('screen-home').style.display = 'block';
         }
 
-        // Render 80 Cartels & Simulate Fake Bot Selections
         function renderCartelGrid80() {
             const grid = document.getElementById('cartel-board-80');
             grid.innerHTML = '';
@@ -392,41 +429,16 @@
             }, 800);
         }
 
-        // Start Game Phase
-        function startActiveGamePhase() {
-            isGameRunning = true;
-            if (fakeBotSelectionTimer) clearInterval(fakeBotSelectionTimer);
-
-            // Change main button state
-            let mainBtn = document.getElementById('main-play-btn');
-            mainBtn.disabled = false;
-            mainBtn.innerHTML = `▶ በጨዋታ ላይ...`;
+        function showActiveGameScreen(isWatchingOnly = false) {
+            document.getElementById('screen-home').style.display = 'none';
+            document.getElementById('screen-select-cartel').style.display = 'none';
+            document.getElementById('screen-active-game').style.display = 'block';
 
             if (!selectedCartelNumber && !isWatchingOnly) {
                 selectedCartelNumber = Math.floor(Math.random() * 80) + 1;
             }
 
-            // If user is inside cartel selection screen, push them to active game
-            if (document.getElementById('screen-select-cartel').style.display === 'block') {
-                showActiveGameScreen();
-            }
-        }
-
-        function showActiveGameScreen() {
-            document.getElementById('screen-home').style.display = 'none';
-            document.getElementById('screen-select-cartel').style.display = 'none';
-            document.getElementById('screen-active-game').style.display = 'block';
-
-            let chosenWinner = botWinners[Math.floor(Math.random() * botWinners.length)];
-
-            document.getElementById('players-val').innerText = "80";
-            document.getElementById('derash-val').innerText = chosenWinner.amount;
-
-            startBingoGameEngine(chosenWinner);
-        }
-
-        // Bingo Game Loop
-        function startBingoGameEngine(botWinner) {
+            // Build Matrix 75 Column-wise (ወደ ታች አደራደር)
             const matrix = document.getElementById('matrix-75');
             matrix.innerHTML = '';
             for (let i = 1; i <= 75; i++) {
@@ -442,58 +454,68 @@
                 watchingBox.innerHTML = `<div style="font-size:14px; font-weight:bold; color:#ffca28;">👀 Watching Only</div><div style="font-size:10px; color:#8880a6; margin-top:5px;">ጨዋታ ስለተጀመረ ቀጣዩን ጨዋታ ይጠብቁ</div>`;
             } else {
                 watchingBox.innerHTML = `<div style="font-size:11px; font-weight:bold; color:#00d26a; margin-bottom:4px;">የእርስዎ ካርቴላ #${selectedCartelNumber}</div><div class="cartel-5x5" id="my-cartel-5x5"></div>`;
-                render5x5Board('my-cartel-5x5', []);
+            }
+        }
+
+        function updateActiveGameUI(state) {
+            if (document.getElementById('screen-active-game').style.display !== 'block') {
+                showActiveGameScreen(!localJoinedGame);
             }
 
-            drawnBalls = [];
-            let callCount = 0;
-            document.getElementById('history-balls').innerHTML = '';
+            // Stats Update (Players: 90, Derash: 850)
+            document.getElementById('game-id-val').innerText = state.gameId;
+            document.getElementById('players-val').innerText = state.winnerObj.players;
+            document.getElementById('derash-val').innerText = state.winnerObj.amount;
 
-            if (gameLoopTimer) clearInterval(gameLoopTimer);
+            let secondsInGame = state.timeInCycle - WAITING_TIME;
+            let calledCount = Math.min(25, Math.floor(secondsInGame / 4) + 1);
 
-            // 4-second delay for drawn numbers
-            gameLoopTimer = setInterval(() => {
-                callCount++;
-                document.getElementById('called-count-val').innerText = callCount;
+            document.getElementById('called-count-val').innerText = calledCount;
 
-                let ballNum = Math.floor(Math.random() * 75) + 1;
-                while(drawnBalls.includes(ballNum)) {
-                    ballNum = Math.floor(Math.random() * 75) + 1;
+            let drawnSoFar = state.drawnBallsList.slice(0, calledCount);
+
+            // Highlight Matrix Cells
+            for (let i = 1; i <= 75; i++) {
+                let cellElem = document.getElementById(`m-cell-${i}`);
+                if (cellElem) {
+                    if (drawnSoFar.includes(i)) cellElem.classList.add('drawn');
+                    else cellElem.classList.remove('drawn');
                 }
+            }
 
-                drawnBalls.push(ballNum);
-
+            // Current Ball Display
+            if (drawnSoFar.length > 0) {
+                let currentBall = drawnSoFar[drawnSoFar.length - 1];
                 let letter = "B";
-                if (ballNum >= 16 && ballNum <= 30) letter = "I";
-                else if (ballNum >= 31 && ballNum <= 45) letter = "N";
-                else if (ballNum >= 46 && ballNum <= 60) letter = "G";
-                else if (ballNum >= 61 && ballNum <= 75) letter = "O";
+                if (currentBall >= 16 && currentBall <= 30) letter = "I";
+                else if (currentBall >= 31 && currentBall <= 45) letter = "N";
+                else if (currentBall >= 46 && currentBall <= 60) letter = "G";
+                else if (currentBall >= 61 && currentBall <= 75) letter = "O";
 
-                document.getElementById('current-ball-text').innerText = `${letter}-${ballNum}`;
+                document.getElementById('current-ball-text').innerText = `${letter}-${currentBall}`;
+            }
 
-                let cellElem = document.getElementById(`m-cell-${ballNum}`);
-                if (cellElem) cellElem.classList.add('drawn');
-
-                if (!isWatchingOnly) {
-                    render5x5Board('my-cartel-5x5', drawnBalls);
-                }
-
-                // History Balls Display
-                let histBox = document.getElementById('history-balls');
+            // History Balls
+            let histBox = document.getElementById('history-balls');
+            histBox.innerHTML = '';
+            let recentCalls = drawnSoFar.slice(-4).reverse();
+            recentCalls.forEach(num => {
                 let ballBubble = document.createElement('div');
                 ballBubble.className = 'h-ball';
                 ballBubble.style.background = '#00d26a';
-                ballBubble.innerText = ballNum;
-                histBox.prepend(ballBubble);
-                if (histBox.children.length > 4) histBox.removeChild(histBox.lastChild);
+                ballBubble.innerText = num;
+                histBox.appendChild(ballBubble);
+            });
 
-                // Bot Winner Call Trigger (At ~20 calls)
-                if (callCount >= 20) {
-                    clearInterval(gameLoopTimer);
-                    let randomCartel = Math.floor(Math.random() * 80) + 1;
-                    showBingoWinModal(`${botWinner.name} አሸንፏል! (${botWinner.amount} ብር)`, randomCartel);
-                }
-            }, 4000); 
+            // Update My Cartel Board if Playing
+            if (localJoinedGame) {
+                render5x5Board('my-cartel-5x5', drawnSoFar);
+            }
+
+            // Trigger Bingo Winner Modal at end of calls (at call 20+)
+            if (calledCount >= 20 && document.getElementById('bingoWinModal').style.display !== 'flex') {
+                showBingoWinModal(state.winnerObj.name, (state.cycleIndex % 80) + 1, drawnSoFar);
+            }
         }
 
         function render5x5Board(containerId, drawnList) {
@@ -512,33 +534,23 @@
             });
         }
 
-        function showBingoWinModal(winnerText, cartelNum) {
+        function showBingoWinModal(winnerText, cartelNum, drawnList) {
             document.getElementById('winner-name-txt').innerText = winnerText;
             document.getElementById('winner-cartel-txt').innerText = `CARTEL NO #${cartelNum}`;
-            render5x5Board('win-cartel-board', drawnBalls);
+            render5x5Board('win-cartel-board', drawnList);
             document.getElementById('bingoWinModal').style.display = 'flex';
-
-            let nextTimer = 8;
-            let countInterval = setInterval(() => {
-                nextTimer--;
-                document.getElementById('next-game-timer-txt').innerText = `NEXT GAME IN ${nextTimer}S`;
-                if(nextTimer <= 0) {
-                    clearInterval(countInterval);
-                    document.getElementById('bingoWinModal').style.display = 'none';
-                    leaveGame();
-                }
-            }, 1000);
         }
 
         function leaveGame() {
-            if (gameLoopTimer) clearInterval(gameLoopTimer);
+            leaveGameUI();
+        }
+
+        function leaveGameUI() {
+            document.getElementById('bingoWinModal').style.display = 'none';
             document.getElementById('screen-active-game').style.display = 'none';
             document.getElementById('screen-home').style.display = 'block';
             selectedCartelNumber = null;
-            isWatchingOnly = false;
-
-            // Restart 30-second cycle AFTER game finishes
-            start30SecTimerCycle();
+            localJoinedGame = false;
         }
 
         // Modals & UI Helpers
