@@ -35,7 +35,6 @@
         .b-header { font-weight: 900; font-size: 11px; padding: 4px 0; border-radius: 4px; color: #fff; }
         .b-h-b { background: #2196f3; } .b-h-i { background: #9c27b0; } .b-h-n { background: #e91e63; } .b-h-g { background: #4caf50; } .b-h-o { background: #ff9800; }
         
-        /* 15 ረድፎች እንዲሆኑ የተደረገ የቁጥሮች ማቀናበሪያ */
         .matrix-cells { display: grid; grid-template-columns: repeat(5, 1fr); grid-template-rows: repeat(15, 1fr); grid-auto-flow: column; gap: 2px; text-align: center; }
         .m-cell { background: #241c42; color: #8e84b0; font-size: 10px; font-weight: 700; padding: 5px 0; border-radius: 3px; }
         .m-cell.drawn { background: #00d26a !important; color: #000 !important; font-weight: 900; }
@@ -106,7 +105,7 @@
             </div>
             <div class="cartel-5x5" id="win-cartel-board"></div>
             
-            <div style="font-size: 10px; color: #786f99; margin-top: 15px; font-weight: 700;" id="next-game-timer-txt">NEXT GAME IN 10S</div>
+            <div style="font-size: 10px; color: #786f99; margin-top: 15px; font-weight: 700;">NEXT GAME IN FEW SECONDS</div>
         </div>
     </div>
 
@@ -128,7 +127,8 @@
                 <div style="font-size:12px; color:#ffca28; font-weight:bold;" id="top-timer-header">ጨዋታው ሊጀምር <span id="select-timer-display">30</span> ሰኮንድ ይቀረዋል</div>
             </div>
 
-            <div class="selection-grid" id="cartel-board-80"></div>
+            <!-- 200 Cartels Grid -->
+            <div class="selection-grid" id="cartel-board-200"></div>
 
             <div style="padding: 0 15px;">
                 <button class="play-btn" id="bottom-wait-btn" disabled>እባክዎ <span id="bottom-timer-display">30</span> ሰኮንድ ይጠብቁ</button>
@@ -138,7 +138,7 @@
         <!-- ACTIVE GAME -->
         <div id="screen-active-game" style="display: none;">
             <div class="top-stats">
-                <div class="stat-box"><div class="stat-lbl">Game ID</div><div class="stat-val" id="game-id-val" style="font-size:10px;">DB0DG8HF</div></div>
+                <div class="stat-box"><div class="stat-lbl">Game ID</div><div class="stat-val" id="game-id-val" style="font-size:10px;">--</div></div>
                 <div class="stat-box"><div class="stat-lbl">Players</div><div class="stat-val" id="players-val">90</div></div>
                 <div class="stat-box"><div class="stat-lbl">Bet</div><div class="stat-val">10</div></div>
                 <div class="stat-box"><div class="stat-lbl">Derash</div><div class="stat-val" id="derash-val">850</div></div>
@@ -209,8 +209,7 @@
     <div id="tab-history" class="tab-screen">
         <div style="font-size:16px; font-weight:bold; color:#ffca28; padding:15px;">🕒 የጨዋታ ታሪክ</div>
         <div style="padding:0 15px;" id="history-list-container">
-            <div class="list-item"><div><b>Game #9812</b><br><small style="color:#786f99;">Cartel #14 • 10 ETB</small></div><div style="color:#e53935; font-weight:bold;">ተሸንፈዋል</div></div>
-            <div class="list-item"><div><b>Game #9811</b><br><small style="color:#786f99;">Cartel #08 • 10 ETB</small></div><div style="color:#e53935; font-weight:bold;">ተሸንፈዋል</div></div>
+            <!-- Dynamic History Storage -->
         </div>
     </div>
 
@@ -236,7 +235,6 @@
     </div>
 
     <script>
-        // Telegram WebApp Setup
         let tg = window.Telegram ? window.Telegram.WebApp : null;
         let currentUserId = 0;
         let currentUserName = "Player";
@@ -249,22 +247,44 @@
             }
         }
 
-        // Persistent Balance Management
         let storedBalance = localStorage.getItem('safari_bingo_balance');
         let balance = (storedBalance !== null) ? parseInt(storedBalance) : 20;
 
         let playedGamesCount = parseInt(localStorage.getItem('safari_bingo_played') || '0');
         let wonGamesCount = parseInt(localStorage.getItem('safari_bingo_won') || '0');
+        let gameHistory = JSON.parse(localStorage.getItem('safari_bingo_history') || '[]');
 
         function updateBalanceUI() {
             localStorage.setItem('safari_bingo_balance', balance);
             localStorage.setItem('safari_bingo_played', playedGamesCount);
             localStorage.setItem('safari_bingo_won', wonGamesCount);
+            localStorage.setItem('safari_bingo_history', JSON.stringify(gameHistory));
 
             document.getElementById('user-balance-val').innerText = balance;
             document.getElementById('wallet-balance-disp').innerText = balance + " ብር";
             document.getElementById('prof-played').innerText = playedGamesCount;
             document.getElementById('prof-won').innerText = wonGamesCount;
+
+            renderHistoryUI();
+        }
+
+        function renderHistoryUI() {
+            const container = document.getElementById('history-list-container');
+            if (!container) return;
+            if (gameHistory.length === 0) {
+                container.innerHTML = `<div style="color:#8880a6; font-size:12px; margin-top:20px;">ምንም የጨዋታ ታሪክ አልተመዘገበም</div>`;
+                return;
+            }
+            container.innerHTML = '';
+            gameHistory.slice().reverse().forEach(item => {
+                let div = document.createElement('div');
+                div.className = 'list-item';
+                let statusColor = item.won ? '#00d26a' : '#e53935';
+                let statusTxt = item.won ? `አሸንፈዋል (+${item.prize} ETB)` : 'ተሸንፈዋል';
+                div.innerHTML = `<div><b>Game #${item.gameId}</b><br><small style="color:#786f99;">Cartel #${item.cartel} • 10 ETB</small></div>
+                                 <div style="color:${statusColor}; font-weight:bold;">${statusTxt}</div>`;
+                container.appendChild(div);
+            });
         }
 
         document.getElementById('profile-user-name').innerText = currentUserName;
@@ -272,7 +292,7 @@
         document.getElementById('invite-link-input').value = `https://t.me/SafariBingo_Bot?start=ref_${currentUserId || '12345678'}`;
         updateBalanceUI();
 
-        // Bot Winner Names (በእንግሊዝኛ የተደረጉ አሸናፊዎች)
+        // ቋሚ አሸናፊዎች
         const botWinners = [
             { name: "Adisu Winner 🏆", amount: 850, players: 90 },
             { name: "Ela Winner 🏆", amount: 850, players: 90 },
@@ -281,27 +301,80 @@
             { name: "Sara Winner 🏆", amount: 850, players: 90 }
         ];
 
-        const myCardNumbers = [
-            12, 16, 38, 49, 66,
-             3, 20, 45, 46, 69,
-             2, 25, '★', 57, 63,
-             9, 28, 40, 58, 70,
-             4, 23, 35, 53, 74
-        ];
-
-        // 24/7 Global Time Sync (ሁሉም ሰው አንድ አይነት ሰዓትና ጨዋታ ያያል)
-        const WAITING_TIME = 30; // 30 sec wait
-        const GAME_TIME = 100;   // ~100 sec game duration (25 calls * 4 sec)
-        const CYCLE_TIME = WAITING_TIME + GAME_TIME; // Total 130 sec cycle
+        const WAITING_TIME = 30;
+        const GAME_TIME = 100;
+        const CYCLE_TIME = WAITING_TIME + GAME_TIME;
 
         let localJoinedGame = false;
         let selectedCartelNumber = null;
+        let myCartelNumbers = [];
         let fakeBotSelectionTimer = null;
+        let currentRecordedGameId = null;
 
-        // Pseudo-random generator using seed so all clients get SAME drawn numbers
         function seededRandom(seed) {
             let x = Math.sin(seed++) * 10000;
             return x - Math.floor(x);
+        }
+
+        // እያንዳንዱን ካርቴላ (1-200) ከ 1 እስከ 75 ባሉት ቁጥሮች በ B-I-N-G-O ህግ መበታተን
+        function generateCartelForId(cartelNum, seed) {
+            let numbers = [];
+            let ranges = [
+                { min: 1, max: 15 },    // B
+                { min: 16, max: 30 },   // I
+                { min: 31, max: 45 },   // N
+                { min: 46, max: 60 },   // G
+                { min: 61, max: 75 }    // O
+            ];
+
+            let cols = [];
+            let localSeed = seed + cartelNum * 357;
+
+            ranges.forEach((range) => {
+                let colNums = [];
+                while(colNums.length < 5) {
+                    let r = Math.floor(seededRandom(localSeed++) * (range.max - range.min + 1)) + range.min;
+                    if(!colNums.includes(r)) colNums.push(r);
+                }
+                cols.push(colNums);
+            });
+
+            for(let r = 0; r < 5; r++) {
+                for(let c = 0; c < 5; c++) {
+                    if (r === 2 && c === 2) {
+                        numbers.push('★');
+                    } else {
+                        numbers.push(cols[c][r]);
+                    }
+                }
+            }
+            return numbers;
+        }
+
+        // BINGO pattern መስራቱን ማረጋገጫ (Row, Column, Diagonal)
+        function checkBingoWin(cartelNumbers, drawnList) {
+            let isMarked = (val) => val === '★' || drawnList.includes(val);
+
+            for (let r = 0; r < 5; r++) {
+                let rowWin = true;
+                for (let c = 0; c < 5; c++) {
+                    if (!isMarked(cartelNumbers[r * 5 + c])) rowWin = false;
+                }
+                if (rowWin) return true;
+            }
+
+            for (let c = 0; c < 5; c++) {
+                let colWin = true;
+                for (let r = 0; r < 5; r++) {
+                    if (!isMarked(cartelNumbers[r * 5 + c])) colWin = false;
+                }
+                if (colWin) return true;
+            }
+
+            if (isMarked(cartelNumbers[0]) && isMarked(cartelNumbers[6]) && isMarked(cartelNumbers[12]) && isMarked(cartelNumbers[18]) && isMarked(cartelNumbers[24])) return true;
+            if (isMarked(cartelNumbers[4]) && isMarked(cartelNumbers[8]) && isMarked(cartelNumbers[12]) && isMarked(cartelNumbers[16]) && isMarked(cartelNumbers[20])) return true;
+
+            return false;
         }
 
         function getGlobalState() {
@@ -315,10 +388,9 @@
             let winnerObj = botWinners[cycleIndex % botWinners.length];
             let gameId = "DB" + (100000 + (cycleIndex % 899999));
 
-            // Generate deterministic 25 drawn numbers for the current game
             let drawnBallsList = [];
             let seed = cycleIndex * 7777;
-            while(drawnBallsList.length < 25) {
+            while(drawnBallsList.length < 40) {
                 let r = Math.floor(seededRandom(seed++) * 75) + 1;
                 if(!drawnBallsList.includes(r)) {
                     drawnBallsList.push(r);
@@ -332,15 +404,14 @@
                 timeInCycle,
                 winnerObj,
                 gameId,
-                drawnBallsList
+                drawnBallsList,
+                seed
             };
         }
 
-        // Global Tick Loop (Every Second)
         setInterval(() => {
             let state = getGlobalState();
 
-            // Update Wait Timers
             let mainTimerDisp = document.getElementById('main-timer-display');
             let selectTimerDisp = document.getElementById('select-timer-display');
             let bottomTimerDisp = document.getElementById('bottom-timer-display');
@@ -358,11 +429,9 @@
                 mainBtn.innerHTML = `▶ በጨዋታ ላይ... (ለመመልከት ይጫኑ)`;
             }
 
-            // Sync Active Game Phase
             if (!state.isWaitingPhase && (localJoinedGame || document.getElementById('screen-active-game').style.display === 'block')) {
                 updateActiveGameUI(state);
             } else if (state.isWaitingPhase && document.getElementById('screen-active-game').style.display === 'block') {
-                // Game finished, return home
                 leaveGameUI();
             }
         }, 1000);
@@ -371,7 +440,6 @@
             let state = getGlobalState();
 
             if (!state.isWaitingPhase) {
-                // ከሆነ በጨዋታ ላይ ገብተው መመልከት ብቻ ይችላሉ
                 localJoinedGame = false;
                 showActiveGameScreen(true);
                 return;
@@ -379,17 +447,17 @@
 
             if (balance < 10) { showAlert("በቂ ቀሪ ሂሳብ የለም!"); return; }
 
-            // Deduct 10 Birr
             balance -= 10;
             playedGamesCount++;
             updateBalanceUI();
 
             localJoinedGame = true;
+            currentRecordedGameId = null;
             document.getElementById('screen-home').style.display = 'none';
             document.getElementById('screen-select-cartel').style.display = 'block';
 
-            renderCartelGrid80();
-            startFakeBotSelection();
+            renderCartelGrid200();
+            startFakeBotSelection(state.seed);
         }
 
         function goBackHome() {
@@ -398,10 +466,11 @@
             document.getElementById('screen-home').style.display = 'block';
         }
 
-        function renderCartelGrid80() {
-            const grid = document.getElementById('cartel-board-80');
+        // 200 ካርቴላዎችን ማውጣት
+        function renderCartelGrid200() {
+            const grid = document.getElementById('cartel-board-200');
             grid.innerHTML = '';
-            for (let i = 1; i <= 80; i++) {
+            for (let i = 1; i <= 200; i++) {
                 let cell = document.createElement('div');
                 cell.className = 'num-cell';
                 cell.id = `cartel-cell-${i}`;
@@ -418,15 +487,24 @@
             }
         }
 
-        function startFakeBotSelection() {
+        // ቦቱ በራሱ ከ 200 ካርቴላዎች ውስጥ 30 ያህሉን እንዲይዝ የማድረጊያ ዘዴ
+        function startFakeBotSelection(seed) {
             if (fakeBotSelectionTimer) clearInterval(fakeBotSelectionTimer);
+            let takenCount = 0;
+            let localSeed = seed;
+
             fakeBotSelectionTimer = setInterval(() => {
-                let randomNum = Math.floor(Math.random() * 80) + 1;
+                if (takenCount >= 30) {
+                    clearInterval(fakeBotSelectionTimer);
+                    return;
+                }
+                let randomNum = Math.floor(seededRandom(localSeed++) * 200) + 1;
                 let cell = document.getElementById(`cartel-cell-${randomNum}`);
                 if (cell && !cell.classList.contains('my-choice') && !cell.classList.contains('bot-taken')) {
                     cell.classList.add('bot-taken');
+                    takenCount++;
                 }
-            }, 800);
+            }, 300);
         }
 
         function showActiveGameScreen(isWatchingOnly = false) {
@@ -435,10 +513,14 @@
             document.getElementById('screen-active-game').style.display = 'block';
 
             if (!selectedCartelNumber && !isWatchingOnly) {
-                selectedCartelNumber = Math.floor(Math.random() * 80) + 1;
+                selectedCartelNumber = Math.floor(Math.random() * 200) + 1;
             }
 
-            // Build Matrix 75 Column-wise (ወደ ታች አደራደር)
+            let state = getGlobalState();
+            if (localJoinedGame) {
+                myCartelNumbers = generateCartelForId(selectedCartelNumber, state.seed);
+            }
+
             const matrix = document.getElementById('matrix-75');
             matrix.innerHTML = '';
             for (let i = 1; i <= 75; i++) {
@@ -462,19 +544,17 @@
                 showActiveGameScreen(!localJoinedGame);
             }
 
-            // Stats Update (Players: 90, Derash: 850)
             document.getElementById('game-id-val').innerText = state.gameId;
             document.getElementById('players-val').innerText = state.winnerObj.players;
             document.getElementById('derash-val').innerText = state.winnerObj.amount;
 
             let secondsInGame = state.timeInCycle - WAITING_TIME;
-            let calledCount = Math.min(25, Math.floor(secondsInGame / 4) + 1);
+            let calledCount = Math.min(35, Math.floor(secondsInGame / 3.5) + 1);
 
             document.getElementById('called-count-val').innerText = calledCount;
 
             let drawnSoFar = state.drawnBallsList.slice(0, calledCount);
 
-            // Highlight Matrix Cells
             for (let i = 1; i <= 75; i++) {
                 let cellElem = document.getElementById(`m-cell-${i}`);
                 if (cellElem) {
@@ -483,7 +563,6 @@
                 }
             }
 
-            // Current Ball Display
             if (drawnSoFar.length > 0) {
                 let currentBall = drawnSoFar[drawnSoFar.length - 1];
                 let letter = "B";
@@ -495,7 +574,6 @@
                 document.getElementById('current-ball-text').innerText = `${letter}-${currentBall}`;
             }
 
-            // History Balls
             let histBox = document.getElementById('history-balls');
             histBox.innerHTML = '';
             let recentCalls = drawnSoFar.slice(-4).reverse();
@@ -507,23 +585,46 @@
                 histBox.appendChild(ballBubble);
             });
 
-            // Update My Cartel Board if Playing
             if (localJoinedGame) {
-                render5x5Board('my-cartel-5x5', drawnSoFar);
-            }
+                render5x5Board('my-cartel-5x5', myCartelNumbers, drawnSoFar);
 
-            // Trigger Bingo Winner Modal at end of calls (at call 20+)
-            if (calledCount >= 20 && document.getElementById('bingoWinModal').style.display !== 'flex') {
-                showBingoWinModal(state.winnerObj.name, (state.cycleIndex % 80) + 1, drawnSoFar);
+                let userWon = checkBingoWin(myCartelNumbers, drawnSoFar);
+
+                if ((userWon || calledCount >= 30) && currentRecordedGameId !== state.gameId) {
+                    currentRecordedGameId = state.gameId;
+
+                    let winnerName = userWon ? currentUserName + " (እርስዎ) 🏆" : state.winnerObj.name;
+                    let winningCartel = userWon ? myCartelNumbers : generateCartelForId((state.cycleIndex % 200) + 1, state.seed);
+                    let winCartelNum = userWon ? selectedCartelNumber : ((state.cycleIndex % 200) + 1);
+
+                    if (userWon) {
+                        wonGamesCount++;
+                        balance += state.winnerObj.amount;
+                    }
+
+                    gameHistory.push({
+                        gameId: state.gameId,
+                        cartel: selectedCartelNumber,
+                        won: userWon,
+                        prize: userWon ? state.winnerObj.amount : 0
+                    });
+
+                    updateBalanceUI();
+                    showBingoWinModal(winnerName, winCartelNum, winningCartel, drawnSoFar);
+                }
+            } else if (calledCount >= 30 && currentRecordedGameId !== state.gameId) {
+                currentRecordedGameId = state.gameId;
+                let winningCartel = generateCartelForId((state.cycleIndex % 200) + 1, state.seed);
+                showBingoWinModal(state.winnerObj.name, (state.cycleIndex % 200) + 1, winningCartel, drawnSoFar);
             }
         }
 
-        function render5x5Board(containerId, drawnList) {
+        function render5x5Board(containerId, cartelNums, drawnList) {
             const container = document.getElementById(containerId);
-            if(!container) return;
+            if(!container || !cartelNums || cartelNums.length === 0) return;
             container.innerHTML = '';
             
-            myCardNumbers.forEach((n) => {
+            cartelNums.forEach((n) => {
                 let cell = document.createElement('div');
                 cell.className = 'c-cell';
                 if (n === '★' || drawnList.includes(n)) {
@@ -534,10 +635,10 @@
             });
         }
 
-        function showBingoWinModal(winnerText, cartelNum, drawnList) {
+        function showBingoWinModal(winnerText, cartelNum, cartelNums, drawnList) {
             document.getElementById('winner-name-txt').innerText = winnerText;
             document.getElementById('winner-cartel-txt').innerText = `CARTEL NO #${cartelNum}`;
-            render5x5Board('win-cartel-board', drawnList);
+            render5x5Board('win-cartel-board', cartelNums, drawnList);
             document.getElementById('bingoWinModal').style.display = 'flex';
         }
 
@@ -553,7 +654,6 @@
             localJoinedGame = false;
         }
 
-        // Modals & UI Helpers
         function openWithdrawModal() {
             document.getElementById('wd-played-txt').innerText = `${playedGamesCount}/10`;
             document.getElementById('wd-won-txt').innerText = `${wonGamesCount}/5`;
