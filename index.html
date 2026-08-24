@@ -55,7 +55,7 @@
         .bingo-modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(5, 2, 15, 0.95); z-index: 99999; align-items: center; justify-content: center; padding: 20px; }
         .win-card { background: #181233; border: 1px solid #332766; border-radius: 20px; padding: 20px; width: 100%; max-width: 320px; text-align: center; }
 
-        .nav-bar { position: fixed; bottom: 0; left: 0; right: 0; background: #0a0614; display: flex; justify-content: space-around; padding: 8px 0; border-top: 1px solid #1a1233; z-index: 999; }
+        .nav-bar { position: fixed; bottom: 0; left: 0; right: 0; background: #0a0614; display: flex; justify-around; padding: 8px 0; border-top: 1px solid #1a1233; z-index: 999; }
         .nav-item { color: #5f577d; font-size: 9px; font-weight: 800; cursor: pointer; text-align: center; flex: 1; }
         .nav-item.active { color: #00d26a; }
         .nav-icon { font-size: 18px; margin-bottom: 2px; }
@@ -196,12 +196,8 @@
     <!-- SCORES TAB -->
     <div id="tab-scores" class="tab-screen">
         <div style="font-size:16px; font-weight:bold; color:#ffca28; padding:15px;">🏆 የዛሬ አሸናፊዎች ዝርዝር</div>
-        <div style="padding:0 15px;">
-            <div class="list-item"><div><b>1. Adisu Winner 🏆</b><br><small style="color:#786f99;">Game #9812</small></div><div style="color:#00d26a; font-weight:bold;">850 ETB</div></div>
-            <div class="list-item"><div><b>2. Ela Winner 🏆</b><br><small style="color:#786f99;">Game #9811</small></div><div style="color:#00d26a; font-weight:bold;">850 ETB</div></div>
-            <div class="list-item"><div><b>3. Damtew Winner 🏆</b><br><small style="color:#786f99;">Game #9810</small></div><div style="color:#00d26a; font-weight:bold;">850 ETB</div></div>
-            <div class="list-item"><div><b>4. Yonas Winner 🏆</b><br><small style="color:#786f99;">Game #9809</small></div><div style="color:#00d26a; font-weight:bold;">850 ETB</div></div>
-            <div class="list-item"><div><b>5. Sara Winner 🏆</b><br><small style="color:#786f99;">Game #9808</small></div><div style="color:#00d26a; font-weight:bold;">850 ETB</div></div>
+        <div style="padding:0 15px;" id="scores-list-container">
+            <!-- Dynamic Scores Grid -->
         </div>
     </div>
 
@@ -254,6 +250,29 @@
         let wonGamesCount = parseInt(localStorage.getItem('safari_bingo_won') || '0');
         let gameHistory = JSON.parse(localStorage.getItem('safari_bingo_history') || '[]');
 
+        // 10 የጨዋታ ውቅሮች (Players, Derash, Bot Cartels)
+        const gameConfigs = [
+            { players: 90, derash: 850, botCartels: 60 },
+            { players: 80, derash: 750, botCartels: 50 },
+            { players: 84, derash: 790, botCartels: 54 },
+            { players: 72, derash: 670, botCartels: 52 },
+            { players: 61, derash: 560, botCartels: 31 },
+            { players: 37, derash: 320, botCartels: 30 },
+            { players: 56, derash: 510, botCartels: 45 },
+            { players: 16, derash: 110, botCartels: 12 },
+            { players: 52, derash: 470, botCartels: 44 },
+            { players: 8,  derash: 60,  botCartels: 7 }
+        ];
+
+        // ቋሚ የአሸናፊ ስሞች
+        const botNames = [
+            "Adisu Winner 🏆",
+            "Ela Winner 🏆",
+            "Damtew Winner 🏆",
+            "Yonas Winner 🏆",
+            "Sara Winner 🏆"
+        ];
+
         function updateBalanceUI() {
             localStorage.setItem('safari_bingo_balance', balance);
             localStorage.setItem('safari_bingo_played', playedGamesCount);
@@ -266,6 +285,30 @@
             document.getElementById('prof-won').innerText = wonGamesCount;
 
             renderHistoryUI();
+            renderScoresUI();
+        }
+
+        function renderScoresUI() {
+            const container = document.getElementById('scores-list-container');
+            if (!container) return;
+            container.innerHTML = '';
+            
+            // የዛሬ አሸናፊዎች ዝርዝር እንደ ተራው የደራሽ መጠን
+            const scoresData = [
+                { name: "Adisu Winner 🏆", gameId: "9812", prize: 850 },
+                { name: "Ela Winner 🏆", gameId: "9811", prize: 750 },
+                { name: "Damtew Winner 🏆", gameId: "9810", prize: 790 },
+                { name: "Yonas Winner 🏆", gameId: "9809", prize: 670 },
+                { name: "Sara Winner 🏆", gameId: "9808", prize: 560 }
+            ];
+
+            scoresData.forEach((item, index) => {
+                let div = document.createElement('div');
+                div.className = 'list-item';
+                div.innerHTML = `<div><b>${index + 1}. ${item.name}</b><br><small style="color:#786f99;">Game #${item.gameId}</small></div>
+                                 <div style="color:#00d26a; font-weight:bold;">${item.prize} ETB</div>`;
+                container.appendChild(div);
+            });
         }
 
         function renderHistoryUI() {
@@ -292,15 +335,6 @@
         document.getElementById('invite-link-input').value = `https://t.me/safariibingobot?start=ref_${currentUserId || '12345678'}`;
         updateBalanceUI();
 
-        // ቋሚ አሸናፊዎች
-        const botWinners = [
-            { name: "Adisu Winner 🏆", amount: 850, players: 90 },
-            { name: "Ela Winner 🏆", amount: 850, players: 90 },
-            { name: "Damtew Winner 🏆", amount: 850, players: 90 },
-            { name: "Yonas Winner 🏆", amount: 850, players: 90 },
-            { name: "Sara Winner 🏆", amount: 850, players: 90 }
-        ];
-
         const WAITING_TIME = 30;
         const GAME_TIME = 100;
         const CYCLE_TIME = WAITING_TIME + GAME_TIME;
@@ -316,7 +350,6 @@
             return x - Math.floor(x);
         }
 
-        // እያንዳንዱን ካርቴላ (1-200) ከ 1 እስከ 75 ባሉት ቁጥሮች በ B-I-N-G-O ህግ መበታተን
         function generateCartelForId(cartelNum, seed) {
             let numbers = [];
             let ranges = [
@@ -351,7 +384,6 @@
             return numbers;
         }
 
-        // BINGO pattern መስራቱን ማረጋገጫ (Row, Column, Diagonal)
         function checkBingoWin(cartelNumbers, drawnList) {
             let isMarked = (val) => val === '★' || drawnList.includes(val);
 
@@ -385,7 +417,11 @@
             let isWaitingPhase = timeInCycle < WAITING_TIME;
             let phaseTimeLeft = isWaitingPhase ? (WAITING_TIME - timeInCycle) : (CYCLE_TIME - timeInCycle);
 
-            let winnerObj = botWinners[cycleIndex % botWinners.length];
+            // 10 ዙሮች በየተራ ይሽከረከራሉ
+            let configIndex = cycleIndex % gameConfigs.length;
+            let currentConfig = gameConfigs[configIndex];
+
+            let winnerName = botNames[cycleIndex % botNames.length];
             let gameId = "DB" + (100000 + (cycleIndex % 899999));
 
             let drawnBallsList = [];
@@ -402,7 +438,8 @@
                 isWaitingPhase,
                 phaseTimeLeft,
                 timeInCycle,
-                winnerObj,
+                winnerName,
+                config: currentConfig,
                 gameId,
                 drawnBallsList,
                 seed
@@ -457,7 +494,7 @@
             document.getElementById('screen-select-cartel').style.display = 'block';
 
             renderCartelGrid200();
-            startFakeBotSelection(state.seed);
+            startFakeBotSelection(state.seed, state.config.botCartels);
         }
 
         function goBackHome() {
@@ -466,7 +503,6 @@
             document.getElementById('screen-home').style.display = 'block';
         }
 
-        // 200 ካርቴላዎችን ማውጣት
         function renderCartelGrid200() {
             const grid = document.getElementById('cartel-board-200');
             grid.innerHTML = '';
@@ -487,14 +523,15 @@
             }
         }
 
-        // ቦቱ በራሱ ከ 200 ካርቴላዎች ውስጥ 30 ያህሉን እንዲይዝ የማድረጊያ ዘዴ
-        function startFakeBotSelection(seed) {
+        // ቦቱ በተሰጠው የካርቴላ መጠን (botCartels Target) መሰረት በ30 ሰኮንድ ውስጥ አስመስሎ እንዲመርጥ
+        function startFakeBotSelection(seed, targetBotCartels) {
             if (fakeBotSelectionTimer) clearInterval(fakeBotSelectionTimer);
             let takenCount = 0;
             let localSeed = seed;
+            let intervalSpeed = Math.floor((30 * 1000) / (targetBotCartels + 2));
 
             fakeBotSelectionTimer = setInterval(() => {
-                if (takenCount >= 30) {
+                if (takenCount >= targetBotCartels) {
                     clearInterval(fakeBotSelectionTimer);
                     return;
                 }
@@ -504,7 +541,7 @@
                     cell.classList.add('bot-taken');
                     takenCount++;
                 }
-            }, 300);
+            }, Math.max(intervalSpeed, 100));
         }
 
         function showActiveGameScreen(isWatchingOnly = false) {
@@ -512,11 +549,12 @@
             document.getElementById('screen-select-cartel').style.display = 'none';
             document.getElementById('screen-active-game').style.display = 'block';
 
+            let state = getGlobalState();
+
             if (!selectedCartelNumber && !isWatchingOnly) {
                 selectedCartelNumber = Math.floor(Math.random() * 200) + 1;
             }
 
-            let state = getGlobalState();
             if (localJoinedGame) {
                 myCartelNumbers = generateCartelForId(selectedCartelNumber, state.seed);
             }
@@ -533,7 +571,13 @@
 
             const watchingBox = document.getElementById('watching-or-card');
             if (isWatchingOnly) {
-                watchingBox.innerHTML = `<div style="font-size:14px; font-weight:bold; color:#ffca28;">👀 Watching Only</div><div style="font-size:10px; color:#8880a6; margin-top:5px;">ጨዋታ ስለተጀመረ ቀጣዩን ጨዋታ ይጠብቁ</div>`;
+                let winCartelNum = ((state.cycleIndex % 200) + 1);
+                let winCartelNums = generateCartelForId(winCartelNum, state.seed);
+                watchingBox.innerHTML = `
+                    <div style="font-size:11px; font-weight:bold; color:#ffca28; margin-bottom:4px;">👀 Watching Only (ካርቴላ #${winCartelNum})</div>
+                    <div class="cartel-5x5" id="watching-cartel-5x5"></div>
+                `;
+                render5x5Board('watching-cartel-5x5', winCartelNums, []);
             } else {
                 watchingBox.innerHTML = `<div style="font-size:11px; font-weight:bold; color:#00d26a; margin-bottom:4px;">የእርስዎ ካርቴላ #${selectedCartelNumber}</div><div class="cartel-5x5" id="my-cartel-5x5"></div>`;
             }
@@ -545,8 +589,8 @@
             }
 
             document.getElementById('game-id-val').innerText = state.gameId;
-            document.getElementById('players-val').innerText = state.winnerObj.players;
-            document.getElementById('derash-val').innerText = state.winnerObj.amount;
+            document.getElementById('players-val').innerText = state.config.players;
+            document.getElementById('derash-val').innerText = state.config.derash;
 
             let secondsInGame = state.timeInCycle - WAITING_TIME;
             let calledCount = Math.min(35, Math.floor(secondsInGame / 3.5) + 1);
@@ -593,29 +637,34 @@
                 if ((userWon || calledCount >= 30) && currentRecordedGameId !== state.gameId) {
                     currentRecordedGameId = state.gameId;
 
-                    let winnerName = userWon ? currentUserName + " (እርስዎ) 🏆" : state.winnerObj.name;
+                    let winnerName = userWon ? currentUserName + " (እርስዎ) 🏆" : state.winnerName;
                     let winningCartel = userWon ? myCartelNumbers : generateCartelForId((state.cycleIndex % 200) + 1, state.seed);
                     let winCartelNum = userWon ? selectedCartelNumber : ((state.cycleIndex % 200) + 1);
 
                     if (userWon) {
                         wonGamesCount++;
-                        balance += state.winnerObj.amount;
+                        balance += state.config.derash;
                     }
 
                     gameHistory.push({
                         gameId: state.gameId,
                         cartel: selectedCartelNumber,
                         won: userWon,
-                        prize: userWon ? state.winnerObj.amount : 0
+                        prize: userWon ? state.config.derash : 0
                     });
 
                     updateBalanceUI();
                     showBingoWinModal(winnerName, winCartelNum, winningCartel, drawnSoFar);
                 }
-            } else if (calledCount >= 30 && currentRecordedGameId !== state.gameId) {
-                currentRecordedGameId = state.gameId;
-                let winningCartel = generateCartelForId((state.cycleIndex % 200) + 1, state.seed);
-                showBingoWinModal(state.winnerObj.name, (state.cycleIndex % 200) + 1, winningCartel, drawnSoFar);
+            } else {
+                let winCartelNum = ((state.cycleIndex % 200) + 1);
+                let winCartelNums = generateCartelForId(winCartelNum, state.seed);
+                render5x5Board('watching-cartel-5x5', winCartelNums, drawnSoFar);
+
+                if (calledCount >= 30 && currentRecordedGameId !== state.gameId) {
+                    currentRecordedGameId = state.gameId;
+                    showBingoWinModal(state.winnerName, winCartelNum, winCartelNums, drawnSoFar);
+                }
             }
         }
 
