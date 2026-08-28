@@ -15,7 +15,7 @@ CHANNELS = [
     "@safariicom_gift",  # 3. ግዴታ
     "@Big_Tech_sami",  # 4. ግዴታ
     "@proofofpaymenty",  # 5. ግዴታ
-    "@alpha_bet_12"   # 6. አማራጭ (ያለቀላቀለም ያሳልፈዋል)
+    "@alpha_bet_12"   # 6. ግዴታ 
 ]
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -25,7 +25,7 @@ async def show_join_channels(update, context):
     keyboard = []
     for i, ch in enumerate(CHANNELS, start=1):
         clean_ch = ch.replace("@", "")
-        label = f"📢 ቻናል {i} ይቀላቀሉ" if i <= 5 else f"📢 ቻናል {i} (አማራጭ)"
+        label = f"📢 ቻናል {i} ይቀላቀሉ" if i <= 5 else f"📢 ቻናል {i} (ይቀላቀሉ)"
         keyboard.append([InlineKeyboardButton(label, url=f"https://t.me/{clean_ch}")])
         
     keyboard.append([InlineKeyboardButton("✅ ተቀላቅያለሁ (Check)", callback_data="verify_join")])
