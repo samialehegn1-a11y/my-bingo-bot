@@ -55,14 +55,14 @@
         .bingo-modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(5, 2, 15, 0.92); z-index: 99999; align-items: center; justify-content: center; padding: 20px; }
         .win-card { background: #181233; border: 1px solid #332766; border-radius: 24px; padding: 24px 20px; width: 100%; max-width: 320px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.8); }
 
-        .nav-bar { position: fixed; bottom: 0; left: 0; right: 0; background: #0a0614; display: flex; justify-around; padding: 8px 0; border-top: 1px solid #1a1233; z-index: 999; }
+        .nav-bar { position: fixed; bottom: 0; left: 0; right: 0; background: #0a0614; display: flex; justify-content: space-around; padding: 8px 0; border-top: 1px solid #1a1233; z-index: 999; }
         .nav-item { color: #5f577d; font-size: 9px; font-weight: 800; cursor: pointer; text-align: center; flex: 1; }
         .nav-item.active { color: #00d26a; }
         .nav-icon { font-size: 18px; margin-bottom: 2px; }
         .tab-screen { display: none; } .tab-screen.active { display: block; }
 
         .custom-popup { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.85); z-index: 999999; justify-content: center; align-items: center; }
-        .popup-box { background: #1f1838; border: 1px solid #ffca28; border-radius: 18px; padding: 20px; width: 300px; text-align: center; }
+        .popup-box { background: #1f1838; border: 1px solid #ffca28; border-radius: 18px; padding: 20px; width: 320px; text-align: center; }
         
         .list-item { background: #171131; border: 1px solid #291e4f; padding: 12px; border-radius: 10px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; text-align: left; }
     </style>
@@ -75,6 +75,9 @@
     <!-- WITHDRAW WARNING POPUP -->
     <div id="withdrawWarnModal" class="custom-popup">
         <div class="popup-box">
+            <div style="font-size:12px; color:#ffca28; font-weight:bold; margin-bottom:10px; border-bottom:1px solid #ffca28; padding-bottom:8px;">
+                📢 ውድ ደንበኛችን ሰሞኑን የቴክኒክ ችግር አጋጥሞን ነበር አሁን withdraw ተስተካክሏል!
+            </div>
             <div id="wd-msg-content" style="font-size:13px; color:#fff; margin-bottom:15px; line-height:1.6; font-weight:600;"></div>
             <button onclick="closeWithdrawModal()" style="background:#ffca28; border:none; padding:10px 30px; border-radius:12px; font-weight:bold; cursor:pointer; color:#000; font-size:14px;">እሺ</button>
         </div>
@@ -93,7 +96,7 @@
         <div class="win-card">
             <div style="font-size: 38px; margin-bottom: -5px;">👑</div>
             <div style="font-size: 26px; font-weight: 900; color: #fff; letter-spacing: 1px;">BINGO! 🎉</div>
-            <div style="font-size: 16px; font-weight: 800; color: #fff; margin: 4px 0 8px 0;" id="winner-name-txt">እርስዎ (You) Won!</div>
+            <div style="font-size: 16px; font-weight: 800; color: #fff; margin: 4px 0 8px 0;" id="winner-name-txt">Winner</div>
             <div style="font-size: 11px; font-weight: 800; color: #ffca28; margin-bottom: 12px; letter-spacing: 0.5px;" id="winner-cartel-txt">CARTEL NO #14</div>
             
             <div class="bingo-cols">
@@ -192,17 +195,13 @@
     <!-- SCORES TAB -->
     <div id="tab-scores" class="tab-screen">
         <div style="font-size:16px; font-weight:bold; color:#ffca28; padding:15px;">🏆 የዛሬ አሸናፊዎች ዝርዝር</div>
-        <div style="padding:0 15px;" id="scores-list-container">
-            <!-- Dynamic Scores Grid -->
-        </div>
+        <div style="padding:0 15px;" id="scores-list-container"></div>
     </div>
 
     <!-- HISTORY TAB -->
     <div id="tab-history" class="tab-screen">
         <div style="font-size:16px; font-weight:bold; color:#ffca28; padding:15px;">🕒 የጨዋታ ታሪክ</div>
-        <div style="padding:0 15px;" id="history-list-container">
-            <!-- Dynamic History Storage -->
-        </div>
+        <div style="padding:0 15px;" id="history-list-container"></div>
     </div>
 
     <!-- PROFILE TAB -->
@@ -246,7 +245,6 @@
         let wonGamesCount = parseInt(localStorage.getItem('safari_bingo_won') || '0');
         let gameHistory = JSON.parse(localStorage.getItem('safari_bingo_history') || '[]');
 
-        // 10 የጨዋታ ውቅሮች (Players, Derash, Bot Cartels)
         const gameConfigs = [
             { players: 90, derash: 850, botCartels: 60 },
             { players: 80, derash: 750, botCartels: 50 },
@@ -260,7 +258,6 @@
             { players: 8,  derash: 60,  botCartels: 7 }
         ];
 
-        // ቋሚ የአሸናፊ ስሞች
         const botNames = [
             "Adisu Winner 🏆",
             "Ela Winner 🏆",
@@ -345,6 +342,7 @@
 
         let localJoinedGame = false;
         let selectedCartelNumber = null;
+        let selectedCartelsList = []; // ለ 5 ካርቴላ ገደብ
         let myCartelNumbers = [];
         let fakeBotSelectionTimer = null;
         let currentRecordedGameId = null;
@@ -386,44 +384,6 @@
                 }
             }
             return numbers;
-        }
-
-        function checkBingoWin(cartelNumbers, drawnList) {
-            return getFirstWinningPattern(cartelNumbers, drawnList) !== null;
-        }
-
-        function getFirstWinningPattern(cartelNumbers, drawnList) {
-            let isMarked = (val) => val === '★' || drawnList.includes(val);
-
-            // Row check
-            for (let r = 0; r < 5; r++) {
-                let rowWin = true;
-                for (let c = 0; c < 5; c++) {
-                    if (!isMarked(cartelNumbers[r * 5 + c])) rowWin = false;
-                }
-                if (rowWin) return { type: 'row', index: r };
-            }
-
-            // Column check
-            for (let c = 0; c < 5; c++) {
-                let colWin = true;
-                for (let r = 0; r < 5; r++) {
-                    if (!isMarked(cartelNumbers[r * 5 + c])) colWin = false;
-                }
-                if (colWin) return { type: 'col', index: c };
-            }
-
-            // Diagonal check 1
-            if (isMarked(cartelNumbers[0]) && isMarked(cartelNumbers[6]) && isMarked(cartelNumbers[12]) && isMarked(cartelNumbers[18]) && isMarked(cartelNumbers[24])) {
-                return { type: 'diag', index: 1 };
-            }
-
-            // Diagonal check 2
-            if (isMarked(cartelNumbers[4]) && isMarked(cartelNumbers[8]) && isMarked(cartelNumbers[12]) && isMarked(cartelNumbers[16]) && isMarked(cartelNumbers[20])) {
-                return { type: 'diag', index: 2 };
-            }
-
-            return null;
         }
 
         function getGlobalState() {
@@ -515,6 +475,7 @@
 
             localJoinedGame = true;
             currentRecordedGameId = null;
+            selectedCartelsList = []; // እንደገና ማስጀመር
             document.getElementById('screen-home').style.display = 'none';
             document.getElementById('screen-select-cartel').style.display = 'block';
 
@@ -538,11 +499,20 @@
                 cell.innerText = i;
                 cell.onclick = function() {
                     if (cell.classList.contains('bot-taken')) return;
-                    document.querySelectorAll('.num-cell').forEach(c => {
-                        if (!c.classList.contains('bot-taken')) c.classList.remove('my-choice');
-                    });
-                    cell.classList.add('my-choice');
-                    selectedCartelNumber = i;
+                    
+                    // 5 ካርቴላ ገደብ ማረጋገጫ
+                    if (cell.classList.contains('my-choice')) {
+                        cell.classList.remove('my-choice');
+                        selectedCartelsList = selectedCartelsList.filter(id => id !== i);
+                    } else {
+                        if (selectedCartelsList.length >= 5) {
+                            showAlert("ከ 5 ካርቴላ በላይ መምረጥ አይችሉም!");
+                            return;
+                        }
+                        cell.classList.add('my-choice');
+                        selectedCartelsList.push(i);
+                        selectedCartelNumber = i;
+                    }
                 };
                 grid.appendChild(cell);
             }
@@ -595,7 +565,6 @@
 
             const watchingBox = document.getElementById('watching-or-card');
             if (isWatchingOnly) {
-                // ላልመረጡ ሰዎች ባዶ ሳጥን ብቻ እንዲሆን የተደረገ
                 watchingBox.innerHTML = `
                     <div style="font-size:11px; font-weight:bold; color:#ffca28; margin-bottom:4px;">👀 Watching Only</div>
                     <div class="cartel-5x5" id="watching-cartel-5x5"></div>
@@ -618,6 +587,7 @@
             }
         }
 
+        // ቦቱ ብቻ እንዲያሸንፍ እና ተጫዋቾች ሁልጊዜ እንዲሸነፉ የተደረገ
         function updateActiveGameUI(state) {
             if (document.getElementById('screen-active-game').style.display !== 'block') {
                 showActiveGameScreen(!localJoinedGame);
@@ -664,43 +634,33 @@
                 histBox.appendChild(ballBubble);
             });
 
-            // 1. ተጫዋች ካርቴላ መርጦ ከተጫወተ
+            // ያልተያዘ የቦት ካርቴላ ማዘጋጃ
+            let winCartelNum = ((state.cycleIndex % 200) + 1);
+            let botWinningCartelNums = generateCartelForId(winCartelNum, state.seed);
+
             if (localJoinedGame) {
                 render5x5Board('my-cartel-5x5', myCartelNumbers, drawnSoFar);
 
-                let userWon = checkBingoWin(myCartelNumbers, drawnSoFar);
-
-                if ((userWon || state.isWinShowPhase) && currentRecordedGameId !== state.gameId) {
+                if (state.isWinShowPhase && currentRecordedGameId !== state.gameId) {
                     currentRecordedGameId = state.gameId;
 
-                    let winnerText = userWon ? "እርስዎ (You) Won!" : state.winnerName;
-                    let winningCartel = userWon ? myCartelNumbers : generateCartelForId((state.cycleIndex % 200) + 1, state.seed);
-                    let winCartelNum = userWon ? selectedCartelNumber : ((state.cycleIndex % 200) + 1);
-
-                    if (userWon) {
-                        wonGamesCount++;
-                        balance += state.config.derash;
-                    }
-
+                    // ተጫዋቹ ሁልጊዜ ይሸነፋል
                     gameHistory.push({
                         gameId: state.gameId,
                         cartel: selectedCartelNumber,
-                        won: userWon,
-                        prize: userWon ? state.config.derash : 0
+                        won: false,
+                        prize: 0
                     });
 
                     updateBalanceUI();
-                    showBingoWinModal(winnerText, winCartelNum, winningCartel, drawnSoFar);
+                    showBingoWinModal(state.winnerName, winCartelNum, botWinningCartelNums, drawnSoFar);
                 }
             } else {
-                // 2. ተመልካች ብቻ ከሆነ
                 renderEmpty5x5Board('watching-cartel-5x5');
 
                 if (state.isWinShowPhase && currentRecordedGameId !== state.gameId) {
                     currentRecordedGameId = state.gameId;
-                    let winCartelNum = ((state.cycleIndex % 200) + 1);
-                    let winCartelNums = generateCartelForId(winCartelNum, state.seed);
-                    showBingoWinModal(state.winnerName, winCartelNum, winCartelNums, drawnSoFar);
+                    showBingoWinModal(state.winnerName, winCartelNum, botWinningCartelNums, drawnSoFar);
                 }
             }
 
@@ -709,34 +669,17 @@
             }
         }
 
-        // ያሸነፈበትን መስመር (Winning Pattern) ብቻ ለይቶ የሚያበራ ተግባር
         function render5x5Board(containerId, cartelNums, drawnList) {
             const container = document.getElementById(containerId);
             if(!container || !cartelNums || cartelNums.length === 0) return;
             container.innerHTML = '';
 
-            let winningPattern = getFirstWinningPattern(cartelNums, drawnList);
-
-            cartelNums.forEach((n, idx) => {
+            cartelNums.forEach((n) => {
                 let cell = document.createElement('div');
                 cell.className = 'c-cell';
-
-                let row = Math.floor(idx / 5);
-                let col = idx % 5;
-                let isWinningCell = false;
-
-                // ያሸነፈበት መስመር ካለ የእሱን ህግ ተከትሎ ማብራት
-                if (winningPattern) {
-                    if (winningPattern.type === 'row' && row === winningPattern.index) isWinningCell = true;
-                    if (winningPattern.type === 'col' && col === winningPattern.index) isWinningCell = true;
-                    if (winningPattern.type === 'diag' && winningPattern.index === 1 && row === col) isWinningCell = true;
-                    if (winningPattern.type === 'diag' && winningPattern.index === 2 && (row + col === 4)) isWinningCell = true;
-                }
-
-                if (isWinningCell) {
+                if (n === '★' || drawnList.includes(n)) {
                     cell.classList.add('marked');
                 }
-
                 cell.innerText = n;
                 container.appendChild(cell);
             });
@@ -761,19 +704,21 @@
             localJoinedGame = false;
         }
 
+        // WITHDRAW POPUP ሎጂክ
         function openWithdrawModal() {
             const msgBox = document.getElementById('wd-msg-content');
             if (balance < 50) {
                 msgBox.innerHTML = `እባክዎ ገንዘብ ለማውጣት ዝቅተኛው የማውጣት መጠን <span style="color:#e53935; font-weight:bold;">50 ብር</span> ነው!`;
             } else {
                 msgBox.innerHTML = `
-                    ገንዘብ ለማውጣት ግዴታ ቢያንስ 10 ጨዋታ መጫወት እና 5 ጨዋታ ማሸነፍ አለቦት!<br><br>
+                    እባክዎ 10 ጨዋታ ይጫወቱ እንዲሁም 5 ጨዋታ ያሸንፉ!<br><br>
                     እስካሁን የተጫወቱት:- <span style="color:#ffca28; font-weight:bold;">${playedGamesCount}/10</span><br>
                     ያሸነፉት:- <span style="color:#00d26a; font-weight:bold;">${wonGamesCount}/5</span>
                 `;
             }
             document.getElementById('withdrawWarnModal').style.display = 'flex';
         }
+
         function closeWithdrawModal() { document.getElementById('withdrawWarnModal').style.display = 'none'; }
 
         function showAlert(msg) {
