@@ -76,7 +76,7 @@
     <div id="withdrawWarnModal" class="custom-popup">
         <div class="popup-box">
             <div style="font-size:12px; color:#ffca28; font-weight:bold; margin-bottom:10px; border-bottom:1px solid #ffca28; padding-bottom:8px;">
-                📢 ውድ ደንበኛችን ሰሞኑን የቴክኒክ ችግር አጋጥሞን ነበር አሁን withdraw ተስተካክሏል!
+                📢 ማስታወቂያ
             </div>
             <div id="wd-msg-content" style="font-size:13px; color:#fff; margin-bottom:15px; line-height:1.6; font-weight:600;"></div>
             <button onclick="closeWithdrawModal()" style="background:#ffca28; border:none; padding:10px 30px; border-radius:12px; font-weight:bold; cursor:pointer; color:#000; font-size:14px;">እሺ</button>
@@ -241,8 +241,12 @@
         let storedBalance = localStorage.getItem('safari_bingo_balance');
         let balance = (storedBalance !== null) ? parseInt(storedBalance) : 20;
 
-        let playedGamesCount = parseInt(localStorage.getItem('safari_bingo_played') || '0');
-        let wonGamesCount = parseInt(localStorage.getItem('safari_bingo_won') || '0');
+        // የጨዋታዎችን ብዛት ለሁሉም ተጠቃሚዎች በአዲስ ከ 0 እንዲጀምር ማድረግ
+        let playedGamesCount = 0;
+        let wonGamesCount = 0;
+        localStorage.setItem('safari_bingo_played', '0');
+        localStorage.setItem('safari_bingo_won', '0');
+
         let gameHistory = JSON.parse(localStorage.getItem('safari_bingo_history') || '[]');
 
         const gameConfigs = [
@@ -410,20 +414,10 @@
             let winCartelNum = ((cycleIndex % 200) + 1);
             let botWinningCartelNums = generateCartelForId(winCartelNum, seed);
 
-            // ቦቱ በትክክል ህጋዊ መስመር (Winning Line) እንዲይዝ ቁጥሮችን ማዘጋጀት
             let winningLines = [
-                [0, 1, 2, 3, 4],       // Row 1
-                [5, 6, 7, 8, 9],       // Row 2
-                [10, 11, 12, 13, 14],  // Row 3
-                [15, 16, 17, 18, 19],  // Row 4
-                [20, 21, 22, 23, 24],  // Row 5
-                [0, 5, 10, 15, 20],    // Col 1
-                [1, 6, 11, 16, 21],    // Col 2
-                [2, 7, 12, 17, 22],    // Col 3
-                [3, 8, 13, 18, 23],    // Col 4
-                [4, 9, 14, 19, 24],    // Col 5
-                [0, 6, 12, 18, 24],    // Diag 1
-                [4, 8, 12, 16, 20]     // Diag 2
+                [0, 1, 2, 3, 4], [5, 6, 7, 8, 9], [10, 11, 12, 13, 14], [15, 16, 17, 18, 19], [20, 21, 22, 23, 24],
+                [0, 5, 10, 15, 20], [1, 6, 11, 16, 21], [2, 7, 12, 17, 22], [3, 8, 13, 18, 23], [4, 9, 14, 19, 24],
+                [0, 6, 12, 18, 24], [4, 8, 12, 16, 20]
             ];
 
             let chosenLineIdx = cycleIndex % winningLines.length;
@@ -435,21 +429,18 @@
                 if (val !== '★') botLineNums.push(val);
             });
 
-            // የተጠሩት ዕጣዎች መጠን ማመጣጠን (ከ22 እስከ 28 ቁጥሮች)
             let drawnBallsList = [...botLineNums];
             let poolSeed = seed + 100;
 
-            // ተጫዋቹ የመረጠው ካርቴላ ቢንጎ እንዳይሰራ የያዛቸውን ቁጥሮች መፈተሽ
             let playerNums = selectedCartelNumber ? generateCartelForId(selectedCartelNumber, seed) : [];
 
             while (drawnBallsList.length < 26) {
                 let r = Math.floor(seededRandom(poolSeed++) * 75) + 1;
                 if (!drawnBallsList.includes(r)) {
-                    // ተጫዋቹ ካርቴላ ቢንጎ እንዳይሰራ መቆጣጠር
                     if (playerNums.length > 0) {
                         let testDrawn = [...drawnBallsList, r];
                         if (checkBingoLine(playerNums, testDrawn)) {
-                            continue; // ከተጫዋቹ ቢንጎ የሚያደርግ ከሆነ ቁጥሩን ማለፍ
+                            continue;
                         }
                     }
                     drawnBallsList.push(r);
@@ -758,10 +749,16 @@
 
         function openWithdrawModal() {
             const msgBox = document.getElementById('wd-msg-content');
+            
+            playedGamesCount = parseInt(localStorage.getItem('safari_bingo_played') || '0');
+            wonGamesCount = parseInt(localStorage.getItem('safari_bingo_won') || '0');
+            
+            let announceMsg = `<b>ውድ ደንበኛችን ሰሞኑን የቴክኒክ ችግር አጋጥሞን ነበር እና ለተፈጠረው የwithdraw ትእዛዝ ችግር ይቅርታ ብለናል አሁን بأዲሱ ተመልሰናል ተዝናኑ Safari Bingo!</b><br><br>`;
+
             if (balance < 50) {
-                msgBox.innerHTML = `እባክዎ ገንዘብ ለማውጣት ዝቅተኛው የማውጣት መጠን <span style="color:#e53935; font-weight:bold;">50 ብር</span> ነው!`;
+                msgBox.innerHTML = announceMsg + `እባክዎ ገንዘብ ለማውጣት ዝቅተኛው የማውጣት መጠን <span style="color:#e53935; font-weight:bold;">50 ብር</span> ነው!`;
             } else {
-                msgBox.innerHTML = `
+                msgBox.innerHTML = announceMsg + `
                     እባክዎ 10 ጨዋታ ይጫወቱ እንዲሁም 5 ጨዋታ ያሸንፉ!<br><br>
                     እስካሁን የተጫወቱት:- <span style="color:#ffca28; font-weight:bold;">${playedGamesCount}/10</span><br>
                     ያሸነፉት:- <span style="color:#00d26a; font-weight:bold;">${wonGamesCount}/5</span>
